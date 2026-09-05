@@ -249,7 +249,27 @@ function QuotationDetailContent() {
       }
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || 'Submit failed');
+      alert(err.response?.data?.message || 'Failed to submit quotation');
+    }
+  };
+
+  const [confirmingDeal, setConfirmingDeal] = useState(false);
+
+  const handleConfirmDeal = async () => {
+    try {
+      setConfirmingDeal(true);
+      const res = await apiClient.post(`/quotations/${id}/confirm`);
+      if (res.data?.success) {
+        alert('⚡ Deal confirmed & finalized! Stock allocated in Fulfillment, Invoice generated, and Subscriptions provisioned.');
+        fetchQuotationData();
+      } else {
+        alert(res.data?.message || 'Failed to confirm deal');
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to confirm deal');
+    } finally {
+      setConfirmingDeal(false);
     }
   };
 
@@ -364,6 +384,14 @@ function QuotationDetailContent() {
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Opened by clicking a row on the Quotations list. Add products, apply discounts, review upsells.
           </p>
+          {quotation.requestedDeliveryDate && (
+            <div className="mt-2 text-xs text-brand-400 font-mono flex items-center gap-1.5">
+              <span>📅 Requested Delivery Date:</span>
+              <span className="font-bold text-white bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                {new Date(quotation.requestedDeliveryDate).toLocaleDateString()}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Customer Need & Requirements Visibility Panel (Sales Rep View) */}
@@ -711,6 +739,16 @@ function QuotationDetailContent() {
               className="px-6 py-2.5 bg-[#1A56B0] hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-md transition-colors"
             >
               {user?.role === 'SALES_REP' ? 'Send to Sales Manager for Approval' : 'Submit for Manager Approval'}
+            </button>
+          )}
+
+          {quotation?.status === 'APPROVED' && (
+            <button
+              onClick={handleConfirmDeal}
+              disabled={confirmingDeal}
+              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-emerald-600/20 transition-all disabled:opacity-50 flex items-center gap-2"
+            >
+              {confirmingDeal ? 'Confirming Deal...' : '⚡ Confirm Quotation & Finalize Deal'}
             </button>
           )}
         </div>

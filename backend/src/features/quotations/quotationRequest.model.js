@@ -35,6 +35,10 @@ const quotationRequestSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    requestedDeliveryDate: {
+      type: Date,
+      default: null,
+    },
     status: {
       type: String,
       enum: ['PENDING', 'CONVERTED', 'REJECTED'],

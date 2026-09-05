@@ -64,6 +64,15 @@ function NegotiationHistory({ negotiations, isLoading, error }) {
               </div>
             )}
 
+            {neg.requestedDeliveryDate && (
+              <div className="p-2 bg-blue-950/50 border border-blue-800/50 rounded-lg text-xs font-mono font-bold text-blue-300 flex items-center justify-between">
+                <span>Requested Delivery Date:</span>
+                <span className="text-xs bg-blue-900/80 px-2 py-0.5 rounded text-white font-mono">
+                  📅 {new Date(neg.requestedDeliveryDate).toLocaleDateString()}
+                </span>
+              </div>
+            )}
+
             {neg.message && (
               <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800 text-xs text-slate-200 leading-relaxed font-sans">
                 <span className="text-slate-500 font-semibold uppercase text-[10px] block mb-1">Customer Note / Proposal:</span>

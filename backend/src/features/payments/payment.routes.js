@@ -13,7 +13,7 @@ router.use(authenticate);
 // Record payment (Internal roles only)
 router.post(
   '/',
-  authorize('ADMIN', 'SALES_MANAGER'),
+  authorize('ADMIN', 'SALES_MANAGER', 'SALES_REP', 'FINANCE_OPERATIONS'),
   recordPaymentRules,
   validate,
   controller.recordPayment

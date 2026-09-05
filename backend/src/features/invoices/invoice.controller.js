@@ -67,9 +67,25 @@ async function updateInvoiceStatus(req, res, next) {
   }
 }
 
+async function downloadInvoicePDF(req, res, next) {
+  try {
+    const { invoice, pdfBuffer } = await invoiceService.generateInvoicePDF(
+      req.params.id,
+      req.user.id,
+      req.user.role
+    );
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="Invoice_${invoice.invoiceNumber}_Paid.pdf"`);
+    return res.send(pdfBuffer);
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   createInvoice,
   listInvoices,
   getInvoiceById,
   updateInvoiceStatus,
+  downloadInvoicePDF,
 };

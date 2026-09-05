@@ -7,16 +7,13 @@ import QuotationsList from '../components/QuotationsList';
 import useCustomerPortal from '../hooks/useCustomerPortal';
 import DealHealthWidget from '../../deal-health/components/DealHealthWidget';
 
+import CustomerInvoicesList from '../components/CustomerInvoicesList';
+
 /**
  * PortalDashboardPage
  *
  * Main customer portal dashboard at /portal.
  * Protected by CustomerPortalRoute (requires CUSTOMER role).
- *
- * Displays:
- *   - Customer identity + business profile
- *   - Portal status (activation date, placeholder counts)
- *   - Quotations placeholder (empty state — will be replaced in M3-F2)
  */
 function PortalDashboardPage() {
   const { profile, status, isLoading, error, refetch } = useCustomerPortal();
@@ -37,7 +34,7 @@ function PortalDashboardPage() {
                   : 'Your Portal'}
               </h1>
               <p className="text-slate-400 text-sm mt-1">
-                Manage your account, view quotations, and request new products
+                Manage your account, view quotations, and track invoices &amp; receipts
               </p>
             </div>
             <Link
@@ -84,9 +81,10 @@ function PortalDashboardPage() {
                 <DealHealthWidget />
               </div>
 
-              {/* Right column: Quotations */}
-              <div className="portal-content-area">
+              {/* Right column: Quotations + Invoices */}
+              <div className="portal-content-area space-y-6">
                 <QuotationsList />
+                <CustomerInvoicesList />
               </div>
             </div>
           )}

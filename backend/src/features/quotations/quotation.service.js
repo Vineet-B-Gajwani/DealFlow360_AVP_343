@@ -44,6 +44,7 @@ async function createQuotation(data, actingUser) {
     salesRepId: actingUser?.id || actingUser?._id || data.salesRepId,
     quotationRequestId: data.quotationRequestId || null,
     notes: data.notes || '',
+    requestedDeliveryDate: data.requestedDeliveryDate ? new Date(data.requestedDeliveryDate) : null,
   });
 
   await quotation.save();

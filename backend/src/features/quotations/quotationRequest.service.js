@@ -13,7 +13,7 @@ function makeError(message, statusCode = 400) {
 /**
  * Customer submits a product demand / quote request
  */
-async function createRequest(userId, { items, notes = '' }) {
+async function createRequest(userId, { items, notes = '', requestedDeliveryDate }) {
   const customer = await Customer.findOne({ userId });
   if (!customer) throw makeError('Customer profile not found', 404);
 
@@ -31,6 +31,7 @@ async function createRequest(userId, { items, notes = '' }) {
     requestedBy: userId,
     items: formattedItems,
     notes,
+    requestedDeliveryDate: requestedDeliveryDate ? new Date(requestedDeliveryDate) : null,
   });
 
   await request.save();
@@ -78,6 +79,7 @@ async function convertRequestToQuotation(requestId, actingUser) {
       customerId: reqDoc.customerId,
       quotationRequestId: reqDoc._id,
       notes: reqDoc.notes ? `Created from customer buy demand: ${reqDoc.notes}` : 'Created from customer buy demand',
+      requestedDeliveryDate: reqDoc.requestedDeliveryDate,
     },
     actingUser
   );

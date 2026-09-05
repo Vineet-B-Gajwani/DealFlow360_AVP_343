@@ -42,6 +42,10 @@ const negotiationSchema = new mongoose.Schema(
       type: Number,
       default: null,
     },
+    requestedDeliveryDate: {
+      type: Date,
+      default: null,
+    },
     status: {
       type: String,
       enum: ['PENDING', 'ACCEPTED', 'REJECTED', 'RESOLVED'],

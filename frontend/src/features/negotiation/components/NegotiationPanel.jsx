@@ -10,6 +10,11 @@ function NegotiationPanel({ quotationId }) {
   const [message, setMessage] = useState('');
   const [requestedValue, setRequestedValue] = useState('');
 
+  const [requestedDeliveryDate, setRequestedDeliveryDate] = useState('');
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const maxDateStr = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!message.trim() && formType !== 'COUNTER_DISCOUNT') return;
@@ -18,12 +23,14 @@ function NegotiationPanel({ quotationId }) {
       type: formType,
       message,
       requestedValue: formType === 'COUNTER_DISCOUNT' ? parseFloat(requestedValue) : null,
+      requestedDeliveryDate: requestedDeliveryDate || null,
     };
 
     const success = await submitAction(payload);
     if (success) {
       setMessage('');
       setRequestedValue('');
+      setRequestedDeliveryDate('');
       setActiveTab('history');
     }
   };
@@ -60,47 +67,64 @@ function NegotiationPanel({ quotationId }) {
               <select 
                 value={formType} 
                 onChange={(e) => setFormType(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500 font-medium"
               >
                 <option value="CHANGE_REQUEST">Request Change</option>
-                <option value="COUNTER_DISCOUNT">Counter-Discount</option>
+                <option value="COUNTER_DISCOUNT">Counter-Discount Proposal</option>
                 <option value="CONFIRMATION">Confirm Quotation</option>
               </select>
             </div>
 
-            {formType === 'COUNTER_DISCOUNT' && (
+            {/* Wireframe-matching 2-column input row for Counter Discount % and Requested Delivery Date */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {formType === 'COUNTER_DISCOUNT' && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Counter Discount %</label>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    required
+                    value={requestedValue}
+                    onChange={(e) => setRequestedValue(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500 font-mono"
+                    placeholder="e.g. 15.0%"
+                  />
+                </div>
+              )}
+
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Requested Discount %</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Requested Delivery Date <span className="text-brand-400 text-[10px]">(Max 30 days)</span>
+                </label>
                 <input 
-                  type="number" 
-                  step="0.1"
-                  min="0"
-                  max="100"
-                  required
-                  value={requestedValue}
-                  onChange={(e) => setRequestedValue(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500"
-                  placeholder="e.g. 10.5"
+                  type="date" 
+                  min={todayStr}
+                  max={maxDateStr}
+                  value={requestedDeliveryDate}
+                  onChange={(e) => setRequestedDeliveryDate(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500 font-mono"
                 />
               </div>
-            )}
+            </div>
 
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Message</label>
+              <label className="block text-sm text-slate-400 mb-1">Message / Terms Comment</label>
               <textarea 
                 required={formType !== 'COUNTER_DISCOUNT'}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                rows={4}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500 resize-none"
-                placeholder="Details..."
+                rows={3}
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500 resize-none"
+                placeholder="Specific comments or requirements for the sales representative..."
               />
             </div>
 
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-50"
+              className="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-50 text-sm shadow-md"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Action'}
             </button>

@@ -3,12 +3,35 @@ import { useParams, Link } from 'react-router-dom';
 import { useInvoice } from '../hooks/useInvoices';
 import PaymentModal from '../../payments/components/PaymentModal';
 import PaymentHistory from '../../payments/components/PaymentHistory';
+import invoicesApi from '../api/invoices.api';
 
 function InvoiceDetailPage() {
   const { id } = useParams();
   const { invoice, isLoading, error, refetch } = useInvoice(id);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    try {
+      setDownloadingPDF(true);
+      const response = await invoicesApi.downloadPDF(id);
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Invoice_${invoice?.invoiceNumber || 'Paid'}_Receipt.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('PDF download error:', err);
+      alert(err.response?.data?.message || 'Failed to download PDF');
+    } finally {
+      setDownloadingPDF(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -35,6 +58,7 @@ function InvoiceDetailPage() {
   const subtotal = invoice.subtotal || 0;
   const discountTotal = invoice.discountTotal || invoice.discount || 0;
   const taxTotal = invoice.taxTotal || invoice.tax || 0;
+  const isPaid = invoice.paymentStatus === 'PAID' || invoice.status === 'PAID';
 
   return (
     <div className="min-h-screen bg-slate-950 text-white p-6 md:p-8 font-sans">
@@ -49,14 +73,30 @@ function InvoiceDetailPage() {
             ← Back to Invoices List
           </Link>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
             <button
               onClick={() => window.print()}
               className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg border border-slate-700 transition-colors flex items-center gap-1.5"
             >
               🖨️ Print / Save PDF
             </button>
-            {invoice.paymentStatus !== 'PAID' && (
+
+            {isPaid ? (
+              <button
+                onClick={handleDownloadPDF}
+                disabled={downloadingPDF}
+                className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {downloadingPDF ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Downloading...
+                  </>
+                ) : (
+                  '📥 Download Paid Invoice PDF'
+                )}
+              </button>
+            ) : (
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-brand-600/30 transition-colors"
@@ -171,7 +211,9 @@ function InvoiceDetailPage() {
       {/* Payment Modal */}
       {isModalOpen && (
         <PaymentModal 
+          invoice={invoice}
           invoiceId={id} 
+          isOpen={isModalOpen}
           maxAmount={grandTotal}
           onClose={() => setIsModalOpen(false)}
           onSuccess={() => {

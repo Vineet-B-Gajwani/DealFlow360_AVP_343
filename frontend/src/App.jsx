@@ -76,13 +76,19 @@ function App() {
           </Route>
         </Route>
 
-        {/* ── Role Restricted Routes: Operations & Finance Only ──────────────── */}
+        {/* ── Role Restricted Routes: Operations & Finance ──────────────── */}
         <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'FINANCE_OPERATIONS']} />}>
           <Route element={<AppLayout />}>
             <Route path="/inventory" element={<InventoryListPage />} />
             <Route path="/fulfillment" element={<FulfillmentDashboardPage />} />
             <Route path="/subscriptions" element={<SubscriptionPlansPage />} />
             <Route path="/billing" element={<BillingDashboardPage />} />
+          </Route>
+        </Route>
+
+        {/* ── Invoices Routes ──────────────── */}
+        <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'FINANCE_OPERATIONS', 'CUSTOMER', 'SALES_MANAGER', 'SALES_REP']} />}>
+          <Route element={<AppLayout />}>
             <Route path="/invoices" element={<InvoiceListPage />} />
             <Route path="/invoices/:id" element={<InvoiceDetailPage />} />
           </Route>

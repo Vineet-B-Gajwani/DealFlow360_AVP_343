@@ -73,6 +73,11 @@ function BuyProductsPage() {
     return acc + (item.product.basePrice || 0) * item.quantity;
   }, 0);
 
+  const [requestedDeliveryDate, setRequestedDeliveryDate] = useState('');
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const maxDateStr = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
   const handleSubmitRequest = async (e) => {
     e.preventDefault();
     if (selectedItems.length === 0) {
@@ -93,12 +98,14 @@ function BuyProductsPage() {
       const res = await apiClient.post('/portal/quotation-requests', {
         items: itemsPayload,
         notes,
+        requestedDeliveryDate,
       });
 
       if (res.data?.success) {
         setSuccessMessage('🎉 Product demand submitted successfully! A sales representative will create a quotation for you shortly.');
         setCart({});
         setNotes('');
+        setRequestedDeliveryDate('');
         fetchMyRequests();
       } else {
         setErrorMessage(res.data?.message || 'Failed to submit request');
@@ -252,6 +259,20 @@ function BuyProductsPage() {
                     </div>
 
                     <form onSubmit={handleSubmitRequest} className="space-y-4 pt-2">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 mb-1">
+                          Requested Delivery Date <span className="text-brand-400 text-[10px]">(Max 30 days from today)</span>
+                        </label>
+                        <input
+                          type="date"
+                          min={todayStr}
+                          max={maxDateStr}
+                          value={requestedDeliveryDate}
+                          onChange={(e) => setRequestedDeliveryDate(e.target.value)}
+                          className="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
+                        />
+                      </div>
+
                       <div>
                         <label className="block text-xs font-medium text-slate-400 mb-1">
                           Notes / Specific Requirements (Optional)

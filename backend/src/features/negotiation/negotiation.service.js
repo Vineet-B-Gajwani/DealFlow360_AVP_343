@@ -26,12 +26,14 @@ async function resolveCustomer(userId, quotationId) {
 /**
  * Create a negotiation action (LINE_COMMENT, CHANGE_REQUEST, COUNTER_DISCOUNT, CONFIRMATION).
  */
-async function createNegotiation(userId, { quotationId, quotationLineId, type, message, requestedValue }) {
+async function createNegotiation(userId, { quotationId, quotationLineId, type, message, requestedValue, requestedDeliveryDate }) {
   const customer = await resolveCustomer(userId, quotationId);
 
   const defaultMsg = type === 'COUNTER_DISCOUNT'
     ? `Customer requested counter-discount rate of ${requestedValue || 0}%`
     : 'Negotiation proposal submitted';
+
+  const delivDate = requestedDeliveryDate ? new Date(requestedDeliveryDate) : null;
 
   const negotiation = await Negotiation.create({
     quotationId,
@@ -40,12 +42,16 @@ async function createNegotiation(userId, { quotationId, quotationLineId, type, m
     type,
     message: message && message.trim() ? message.trim() : defaultMsg,
     requestedValue: requestedValue !== undefined && requestedValue !== null ? Number(requestedValue) : null,
+    requestedDeliveryDate: delivDate,
     status: 'PENDING',
   });
 
   const quotation = await Quotation.findById(quotationId);
   if (quotation) {
     quotation.status = QUOTATION_STATUS.NEGOTIATING;
+    if (delivDate) {
+      quotation.requestedDeliveryDate = delivDate;
+    }
     await quotation.save();
   }
 

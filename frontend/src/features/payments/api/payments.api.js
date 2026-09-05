@@ -4,7 +4,9 @@ const API_BASE = '/payments';
 
 const paymentsApi = {
   record: (data) => apiClient.post(API_BASE, data),
+  recordPayment: (data) => apiClient.post(API_BASE, data),
   getByInvoice: (invoiceId) => apiClient.get(`${API_BASE}/invoice/${invoiceId}`),
+  getPaymentsByInvoice: (invoiceId) => apiClient.get(`${API_BASE}/invoice/${invoiceId}`),
 };
 
 export default paymentsApi;

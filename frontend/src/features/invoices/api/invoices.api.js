@@ -7,6 +7,7 @@ const invoicesApi = {
   getById: (id) => apiClient.get(`${API_BASE}/${id}`),
   create: (data) => apiClient.post(API_BASE, data),
   updateStatus: (id, status) => apiClient.patch(`${API_BASE}/${id}/status`, { status }),
+  downloadPDF: (id) => apiClient.get(`${API_BASE}/${id}/pdf`, { responseType: 'blob' }),
 };
 
 export default invoicesApi;

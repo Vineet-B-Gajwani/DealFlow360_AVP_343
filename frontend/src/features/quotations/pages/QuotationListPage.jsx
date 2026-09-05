@@ -81,6 +81,20 @@ function QuotationListPage() {
     CONFIRMED: quotations.filter(q => q.status === 'CONFIRMED'),
   };
 
+  const handleConfirmQuote = async (e, quoteId) => {
+    e.stopPropagation();
+    try {
+      const res = await apiClient.post(`/quotations/${quoteId}/confirm`);
+      if (res.data?.success) {
+        alert('⚡ Deal confirmed & finalized! Allocated in Fulfillment, Invoice generated, and Subscriptions provisioned.');
+        fetchData();
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to confirm quote');
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-8">
       {/* Header */}
@@ -145,6 +159,12 @@ function QuotationListPage() {
                       </ul>
                     </div>
 
+                    {req.requestedDeliveryDate && (
+                      <p className="text-[11px] text-purple-300 font-mono mt-1">
+                        📅 Delivery Date: {new Date(req.requestedDeliveryDate).toLocaleDateString()}
+                      </p>
+                    )}
+
                     {req.notes && (
                       <p className="text-xs text-slate-400 italic mt-2 bg-slate-900/60 p-2 rounded border border-slate-700/50">
                         "{req.notes}"
@@ -195,6 +215,19 @@ function QuotationListPage() {
                         <span>{quote.customerId?.companyName || quote.customerId?.userId?.name || 'Customer'}</span>
                         <span>{quote.lines?.length || 0} items</span>
                       </div>
+                      {quote.requestedDeliveryDate && (
+                        <p className="text-[10px] text-brand-400 font-mono mt-1">
+                          📅 Delivery: {new Date(quote.requestedDeliveryDate).toLocaleDateString()}
+                        </p>
+                      )}
+                      {quote.status === 'APPROVED' && (
+                        <button
+                          onClick={(e) => handleConfirmQuote(e, quoteId)}
+                          className="mt-3 w-full py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded shadow transition-colors flex items-center justify-center gap-1"
+                        >
+                          ⚡ Confirm & Finalize Deal
+                        </button>
+                      )}
                     </div>
                   );
                 })}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import PortalHeader from '../components/PortalHeader';
 import QuotationStatusBadge from '../components/QuotationStatusBadge';
@@ -6,23 +6,36 @@ import QuotationLineTable from '../components/QuotationLineTable';
 import QuotationTotals from '../components/QuotationTotals';
 import useQuotation from '../hooks/useQuotation';
 import NegotiationPanel from '../../negotiation/components/NegotiationPanel';
+import apiClient from '../../auth/api/auth.api';
 
 /**
  * QuotationDetailPage
  *
  * Full quotation detail view at /portal/quotations/:id.
  * Protected by CustomerPortalRoute (requires CUSTOMER role).
- *
- * Displays:
- *   - Quotation number + status
- *   - Line items table (products, quantities, pricing, discounts)
- *   - Financial totals (subtotal, discount, tax, grand total)
- *
- * Does NOT implement negotiation — that is a later feature.
  */
 function QuotationDetailPage() {
   const { id } = useParams();
   const { quotation, isLoading, error, refetch } = useQuotation(id);
+  const [confirming, setConfirming] = useState(false);
+
+  const handleConfirmQuotation = async () => {
+    try {
+      setConfirming(true);
+      const res = await apiClient.post(`/negotiation/${id}/confirm`, {
+        message: 'Quotation accepted and confirmed by customer'
+      });
+      if (res.data?.success) {
+        alert('🎉 Quotation confirmed successfully! Order fulfillment, invoice, and contract provisioning have been triggered.');
+        refetch();
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to confirm quotation');
+    } finally {
+      setConfirming(false);
+    }
+  };
 
   return (
     <div className="portal-layout">
@@ -98,12 +111,42 @@ function QuotationDetailPage() {
                         </span>
                       </p>
                     )}
+                    {quotation.requestedDeliveryDate && (
+                      <p className="text-xs text-brand-300 font-mono mt-1.5 flex items-center gap-1.5">
+                        <span>📅 Requested Delivery Date:</span>
+                        <span className="font-bold text-white bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                          {new Date(quotation.requestedDeliveryDate).toLocaleDateString()}
+                        </span>
+                      </p>
+                    )}
                   </div>
                   <div className="flex-shrink-0" id="quotation-status-badge">
                     <QuotationStatusBadge status={quotation.status} />
                   </div>
                 </div>
               </div>
+
+              {/* Confirm Quotation Action Banner for Approved/Sent Proposals */}
+              {(quotation.status === 'APPROVED' || quotation.status === 'SENT' || quotation.status === 'NEGOTIATING') && (
+                <div className="p-5 bg-emerald-950/60 border border-emerald-500/50 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
+                  <div>
+                    <h3 className="font-bold text-white text-base flex items-center gap-2">
+                      <span>✅ Proposal Approved & Ready for Final Confirmation</span>
+                    </h3>
+                    <p className="text-xs text-emerald-200 mt-1">
+                      Review the line items and pricing below. Click Confirm Quotation to finalize the commercial deal.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={handleConfirmQuotation}
+                    disabled={confirming}
+                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow-lg shadow-emerald-600/30 transition-all disabled:opacity-50 text-sm flex items-center gap-2 whitespace-nowrap"
+                  >
+                    {confirming ? 'Confirming Deal...' : 'Confirm Quotation'}
+                  </button>
+                </div>
+              )}
 
               {/* Status Banner when Pending Final Approval */}
               {quotation.status === 'PENDING_APPROVAL' && (

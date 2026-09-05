@@ -12,7 +12,7 @@ const ALL_MODULES = [
   { name: 'Fulfillment', path: '/fulfillment', roles: ['ADMIN', 'FINANCE_OPERATIONS'] },
   { name: 'Subscriptions', path: '/subscriptions', roles: ['ADMIN', 'FINANCE_OPERATIONS'] },
   { name: 'Billing', path: '/billing', roles: ['ADMIN', 'FINANCE_OPERATIONS'] },
-  { name: 'Invoices', path: '/invoices', roles: ['ADMIN', 'FINANCE_OPERATIONS'] },
+  { name: 'Invoices', path: '/invoices', roles: ['ADMIN', 'FINANCE_OPERATIONS', 'CUSTOMER', 'SALES_MANAGER', 'SALES_REP'] },
   { name: 'Deal Health', path: '/deal-health', roles: ['ADMIN', 'SALES_MANAGER'] },
   { name: 'Reporting', path: '/reporting', roles: ['ADMIN', 'SALES_MANAGER'] },
 ];

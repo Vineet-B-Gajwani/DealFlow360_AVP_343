@@ -16,6 +16,9 @@ router.get('/', controller.listInvoices);
 // Get single invoice
 router.get('/:id', controller.getInvoiceById);
 
+// Download PDF for paid invoice
+router.get('/:id/pdf', controller.downloadInvoicePDF);
+
 // Internal write endpoints
 router.post(
   '/',
