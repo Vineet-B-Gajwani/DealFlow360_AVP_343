@@ -1,10 +1,10 @@
-import axios from 'axios';
+import apiClient from '../../auth/api/auth.api';
 
-const API_BASE = '/api/payments';
+const API_BASE = '/payments';
 
 const paymentsApi = {
-  record: (data) => axios.post(API_BASE, data),
-  getByInvoice: (invoiceId) => axios.get(`${API_BASE}/invoice/${invoiceId}`),
+  record: (data) => apiClient.post(API_BASE, data),
+  getByInvoice: (invoiceId) => apiClient.get(`${API_BASE}/invoice/${invoiceId}`),
 };
 
 export default paymentsApi;

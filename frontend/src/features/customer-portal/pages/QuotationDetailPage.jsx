@@ -105,6 +105,17 @@ function QuotationDetailPage() {
                 </div>
               </div>
 
+              {/* Status Banner when Pending Final Approval */}
+              {quotation.status === 'PENDING_APPROVAL' && (
+                <div className="p-4 bg-amber-950/40 border border-amber-700/60 rounded-xl text-amber-200 text-xs font-medium flex items-center gap-3 shadow-lg">
+                  <span className="text-2xl">⏳</span>
+                  <div>
+                    <span className="font-bold block text-sm text-white">Waiting for Final Approval</span>
+                    <span>This proposal has been submitted by your sales representative and is currently awaiting final manager approval before it can be confirmed.</span>
+                  </div>
+                </div>
+              )}
+
               {/* Line items */}
               <div className="portal-card" id="quotation-lines-card">
                 <h2 className="text-base font-bold text-slate-100 mb-5">

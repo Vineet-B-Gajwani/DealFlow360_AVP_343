@@ -18,11 +18,13 @@ function makeError(message, statusCode = 400) {
  * @param {string} [reason]
  */
 function historyEntry(action, user, reason = '') {
+  const userIdStr = typeof user === 'string' ? user : (user?.id || user?._id || 'SYSTEM');
+  const userLabelStr = typeof user === 'string' ? user : (user?.email || user?.name || userIdStr);
   return {
     action,
-    user: user.id,
-    userLabel: user.email || user.id,
-    reason,
+    user: String(userIdStr),
+    userLabel: String(userLabelStr),
+    reason: reason || '',
     timestamp: new Date(),
   };
 }
@@ -283,11 +285,40 @@ async function getApprovalSummary() {
   };
 }
 
+/**
+ * Escalate an approval request to the Finance Department level.
+ */
+async function escalateToFinance(id, actingUser, reason = '') {
+  const approval = await Approval.findById(id);
+  if (!approval) throw makeError('Approval not found', 404);
+
+  if (approval.status !== APPROVAL_STATUS.PENDING) {
+    throw makeError(
+      `Cannot escalate: approval is already ${approval.status}`,
+      422
+    );
+  }
+
+  approval.requiredLevel = REQUIRED_LEVEL.FINANCE;
+  approval.currentLevel = REQUIRED_LEVEL.FINANCE;
+  approval.history.push(
+    historyEntry(
+      'ESCALATED',
+      actingUser,
+      reason || 'Escalated to Finance Department by Sales Manager'
+    )
+  );
+
+  await approval.save();
+  return approval;
+}
+
 module.exports = {
   createApproval,
   approveApproval,
   rejectApproval,
   returnForRevision,
+  escalateToFinance,
   getApprovalHistory,
   listApprovals,
   getApprovalById,

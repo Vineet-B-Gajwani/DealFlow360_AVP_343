@@ -1,28 +1,23 @@
-import axios from 'axios';
+import apiClient from '../../auth/api/auth.api';
 
-const BASE = '/api/fulfillment';
-
-function authHeader() {
-  const token = localStorage.getItem('accessToken');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
+const BASE = '/fulfillment';
 
 export const getRecommendation = async (payload) => {
-  const { data } = await axios.post(`${BASE}/recommend`, payload, { headers: authHeader() });
+  const { data } = await apiClient.post(`${BASE}/recommend`, payload);
   return data;
 };
 
 export const fetchBackorders = async (params = {}) => {
-  const { data } = await axios.get(`${BASE}/backorders`, { params, headers: authHeader() });
+  const { data } = await apiClient.get(`${BASE}/backorders`, { params });
   return data;
 };
 
 export const createBackorder = async (payload) => {
-  const { data } = await axios.post(`${BASE}/backorders`, payload, { headers: authHeader() });
+  const { data } = await apiClient.post(`${BASE}/backorders`, payload);
   return data;
 };
 
 export const consolidateBackorders = async (productId) => {
-  const { data } = await axios.post(`${BASE}/backorders/consolidate/${productId}`, {}, { headers: authHeader() });
+  const { data } = await apiClient.post(`${BASE}/backorders/consolidate/${productId}`, {});
   return data;
 };

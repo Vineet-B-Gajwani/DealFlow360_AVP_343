@@ -113,6 +113,24 @@ async function returnForRevision(req, res, next) {
 }
 
 /**
+ * POST /api/approvals/:id/escalate
+ * Body: { reason? }
+ */
+async function escalateApproval(req, res, next) {
+  try {
+    if (handleValidation(req, res)) return;
+    const approval = await approvalService.escalateToFinance(
+      req.params.id,
+      req.user,
+      req.body.reason
+    );
+    res.status(200).json({ success: true, data: approval });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
  * GET /api/approvals/summary
  */
 async function getApprovalSummary(req, res, next) {
@@ -131,5 +149,6 @@ module.exports = {
   approveApproval,
   rejectApproval,
   returnForRevision,
+  escalateApproval,
   getApprovalSummary,
 };

@@ -14,24 +14,32 @@ const router = Router();
 
 router.use(authenticate);
 
-// Customer endpoints
+// Post new negotiation message / counter-offer (Customer or Sales Rep)
 router.post(
   '/',
-  authorize('CUSTOMER'),
+  authorize('CUSTOMER', 'SALES_REP', 'SALES_MANAGER', 'ADMIN'),
   createNegotiationRules,
   validate,
   controller.createNegotiation
 );
 
+// Get negotiation history for a quotation (both /:quotationId and /quotation/:quotationId)
 router.get(
-  '/:quotationId',
-  authorize('CUSTOMER', 'ADMIN', 'SALES_MANAGER'),
+  '/quotation/:quotationId',
+  authorize('CUSTOMER', 'ADMIN', 'SALES_MANAGER', 'SALES_REP', 'FINANCE_OPERATIONS'),
   controller.getNegotiationHistory
 );
 
+router.get(
+  '/:quotationId',
+  authorize('CUSTOMER', 'ADMIN', 'SALES_MANAGER', 'SALES_REP', 'FINANCE_OPERATIONS'),
+  controller.getNegotiationHistory
+);
+
+// Confirm quotation
 router.post(
   '/:quotationId/confirm',
-  authorize('CUSTOMER'),
+  authorize('CUSTOMER', 'SALES_REP', 'SALES_MANAGER', 'ADMIN'),
   confirmQuotationRules,
   validate,
   controller.confirmQuotation

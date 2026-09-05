@@ -5,6 +5,7 @@ import productsApi from '../api/products.api';
 import ProductFilters from '../components/ProductFilters';
 import ProductTable from '../components/ProductTable';
 import Pagination from '../components/Pagination';
+import useAuth from '../../auth/hooks/useAuth';
 
 /**
  * ProductListPage
@@ -13,6 +14,7 @@ import Pagination from '../components/Pagination';
  * Route: /products
  */
 function ProductListPage() {
+  const { user } = useAuth();
   const {
     products,
     total,
@@ -29,8 +31,10 @@ function ProductListPage() {
 
   const [isToggling, setIsToggling] = useState(null);
   const [toggleError, setToggleError] = useState('');
+  const canEditProducts = user?.role === 'ADMIN' || user?.role === 'SALES_MANAGER';
 
   const handleToggle = async (product) => {
+    if (!canEditProducts) return;
     setIsToggling(product._id);
     setToggleError('');
     try {
@@ -63,22 +67,24 @@ function ProductListPage() {
               <span>›</span>
               <span className="text-slate-300">Products</span>
             </div>
-            <h1 className="text-2xl font-bold text-white">Product Management</h1>
+            <h1 className="text-2xl font-bold text-white">Product Catalogue</h1>
             <p className="text-slate-400 text-sm mt-1">
-              {total > 0 ? `${total} product${total !== 1 ? 's' : ''}` : 'Manage your product catalogue'}
+              {total > 0 ? `${total} product${total !== 1 ? 's' : ''}` : 'View product catalogue and prices'}
             </p>
           </div>
 
-          <Link
-            to="/products/new"
-            id="create-product-btn"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold shadow-lg shadow-brand-900/30 transition-all hover:shadow-brand-800/40 hover:-translate-y-0.5"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Add product
-          </Link>
+          {canEditProducts && (
+            <Link
+              to="/products/new"
+              id="create-product-btn"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold shadow-lg shadow-brand-900/30 transition-all hover:shadow-brand-800/40 hover:-translate-y-0.5"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Add product
+            </Link>
+          )}
         </div>
 
         {/* ── Filters ─────────────────────────────────────────────────── */}

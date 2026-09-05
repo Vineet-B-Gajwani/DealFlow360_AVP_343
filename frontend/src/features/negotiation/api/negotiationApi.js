@@ -1,17 +1,16 @@
 import apiClient from '../../auth/api/auth.api';
 
 export const negotiationApi = {
-  /**
-   * GET /api/negotiation/quotation/:quotationId
-   */
   getNegotiations: (quotationId) => 
-    apiClient.get(`/negotiation/quotation/${quotationId}`),
+    apiClient.get(`/negotiation/${quotationId}`),
 
-  /**
-   * POST /api/negotiation
-   * payload: { quotationId, quotationLineId, type, message, requestedValue }
-   */
+  getHistory: (quotationId) => 
+    apiClient.get(`/negotiation/${quotationId}`),
+
   submitNegotiation: (payload) => 
+    apiClient.post('/negotiation', payload),
+
+  create: (payload) => 
     apiClient.post('/negotiation', payload),
 };
 

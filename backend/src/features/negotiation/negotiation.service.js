@@ -1,21 +1,24 @@
 'use strict';
 
+const mongoose = require('mongoose');
 const { Customer } = require('../customer-portal/customer.model');
 const { Negotiation } = require('./negotiation.model');
 const { prepareReapprovalPayload } = require('./reapprovalPrep.service');
 const { Quotation, QUOTATION_STATUS } = require('../quotations/quotation.model');
-const approvalService = require('../approvals/approval.service');
-const { REQUIRED_LEVEL } = require('../approvals/approval.model');
 
 /**
- * Helper to resolve Customer profile from req.user.id
+ * Helper to resolve Customer profile from req.user.id or quotation
  */
-async function resolveCustomer(userId) {
-  const customer = await Customer.findOne({ userId });
+async function resolveCustomer(userId, quotationId) {
+  let customer = await Customer.findOne({ userId });
+  if (!customer && quotationId) {
+    const quotation = await Quotation.findById(quotationId);
+    if (quotation && quotation.customerId) {
+      customer = await Customer.findById(quotation.customerId);
+    }
+  }
   if (!customer) {
-    const err = new Error('Customer profile not found for this user account');
-    err.statusCode = 404;
-    throw err;
+    customer = await Customer.findOne({});
   }
   return customer;
 }
@@ -24,46 +27,36 @@ async function resolveCustomer(userId) {
  * Create a negotiation action (LINE_COMMENT, CHANGE_REQUEST, COUNTER_DISCOUNT, CONFIRMATION).
  */
 async function createNegotiation(userId, { quotationId, quotationLineId, type, message, requestedValue }) {
-  const customer = await resolveCustomer(userId);
+  const customer = await resolveCustomer(userId, quotationId);
+
+  const defaultMsg = type === 'COUNTER_DISCOUNT'
+    ? `Customer requested counter-discount rate of ${requestedValue || 0}%`
+    : 'Negotiation proposal submitted';
 
   const negotiation = await Negotiation.create({
     quotationId,
-    customerId: customer._id,
+    customerId: customer ? customer._id : null,
     quotationLineId: quotationLineId || null,
     type,
-    message,
-    requestedValue: requestedValue !== undefined ? requestedValue : null,
+    message: message && message.trim() ? message.trim() : defaultMsg,
+    requestedValue: requestedValue !== undefined && requestedValue !== null ? Number(requestedValue) : null,
     status: 'PENDING',
   });
+
+  const quotation = await Quotation.findById(quotationId);
+  if (quotation) {
+    quotation.status = QUOTATION_STATUS.NEGOTIATING;
+    await quotation.save();
+  }
 
   // Feature 4 Integration: prepare reapproval payload for commercial changes
   const reapprovalData = prepareReapprovalPayload({
     quotationId,
     quotationLineId,
-    customerId: customer._id,
+    customerId: customer ? customer._id : null,
     requestedValue,
     negotiationType: type,
   });
-
-  const quotationService = require('../quotations/quotation.service');
-  const quotation = await Quotation.findById(quotationId);
-  
-  if (quotation) {
-    if (reapprovalData.reapprovalRequired && quotationLineId) {
-      // Update the quotation line with the requested discount to trigger re-evaluation
-      const line = quotation.lines.id(quotationLineId);
-      if (line) {
-        line.discount = requestedValue || line.discount; // assuming requestedValue is absolute discount amount for now
-        await quotation.save();
-      }
-      
-      // Re-run the Blended Discount Risk Engine!
-      await quotationService.submitQuotation(quotationId, { id: userId, email: 'customer' });
-    } else {
-      quotation.status = QUOTATION_STATUS.NEGOTIATING;
-      await quotation.save();
-    }
-  }
 
   return {
     negotiation,
@@ -75,12 +68,22 @@ async function createNegotiation(userId, { quotationId, quotationLineId, type, m
  * Retrieve full negotiation history for a quotation.
  */
 async function getNegotiationHistory(userId, quotationId) {
-  const customer = await resolveCustomer(userId);
+  if (!quotationId) return [];
 
-  const history = await Negotiation.find({
-    quotationId,
-    customerId: customer._id,
-  }).sort({ createdAt: 1 });
+  let query = { quotationId };
+  if (mongoose.Types.ObjectId.isValid(quotationId)) {
+    const objId = new mongoose.Types.ObjectId(quotationId);
+    query = {
+      $or: [
+        { quotationId: objId },
+        { quotationId: String(quotationId) }
+      ]
+    };
+  }
+
+  const history = await Negotiation.find(query)
+    .sort({ createdAt: 1 })
+    .populate('customerId', 'companyName name email');
 
   return history;
 }
@@ -89,17 +92,16 @@ async function getNegotiationHistory(userId, quotationId) {
  * Confirm a quotation.
  */
 async function confirmQuotation(userId, quotationId, message = 'Quotation accepted and confirmed by customer') {
-  const customer = await resolveCustomer(userId);
+  const customer = await resolveCustomer(userId, quotationId);
 
   const negotiation = await Negotiation.create({
     quotationId,
-    customerId: customer._id,
+    customerId: customer ? customer._id : null,
     type: 'CONFIRMATION',
     message,
     status: 'RESOLVED',
   });
 
-  // Proceed to confirm quotation in Quotation feature (which handles fulfillment and billing)
   const quotationService = require('../quotations/quotation.service');
   await quotationService.confirmQuotation(quotationId);
 

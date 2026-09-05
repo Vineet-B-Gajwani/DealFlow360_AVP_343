@@ -10,9 +10,8 @@ const createNegotiationRules = [
     .isIn(['LINE_COMMENT', 'CHANGE_REQUEST', 'COUNTER_DISCOUNT', 'CONFIRMATION'])
     .withMessage('Valid negotiation type is required'),
   body('message')
+    .optional({ nullable: true, checkFalsy: true })
     .trim()
-    .notEmpty()
-    .withMessage('Message cannot be empty')
     .isLength({ max: 2000 })
     .withMessage('Message must not exceed 2000 characters'),
   body('quotationLineId')

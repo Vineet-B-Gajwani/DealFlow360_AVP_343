@@ -1,18 +1,13 @@
-import axios from 'axios';
+import apiClient from '../../auth/api/auth.api';
 
-const BASE = '/api/inventory';
-
-function authHeader() {
-  const token = localStorage.getItem('accessToken');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
+const BASE = '/inventory';
 
 export const fetchInventory = async (params = {}) => {
-  const { data } = await axios.get(BASE, { params, headers: authHeader() });
+  const { data } = await apiClient.get(BASE, { params });
   return data;
 };
 
 export const upsertStock = async (payload) => {
-  const { data } = await axios.post(BASE, payload, { headers: authHeader() });
+  const { data } = await apiClient.post(BASE, payload);
   return data;
 };

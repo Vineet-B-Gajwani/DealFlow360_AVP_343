@@ -56,6 +56,7 @@ export function AuthProvider({ children }) {
 
   // ── Login ─────────────────────────────────────────────────────────────────
   const login = useCallback(async (credentials) => {
+    localStorage.removeItem('accessToken');
     const { data } = await authApi.login(credentials);
     localStorage.setItem('accessToken', data.data.accessToken);
     setUser(data.data.user);
@@ -64,6 +65,7 @@ export function AuthProvider({ children }) {
 
   // ── Register ──────────────────────────────────────────────────────────────
   const register = useCallback(async (userData) => {
+    localStorage.removeItem('accessToken');
     const { data } = await authApi.register(userData);
     localStorage.setItem('accessToken', data.data.accessToken);
     setUser(data.data.user);

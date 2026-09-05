@@ -22,6 +22,7 @@ import ApprovalDashboardPage from './features/approvals/pages/ApprovalDashboardP
 import ApprovalListPage from './features/approvals/pages/ApprovalListPage';
 import ApprovalDetailPage from './features/approvals/pages/ApprovalDetailPage';
 import QuotationDetailPage from './features/customer-portal/pages/QuotationDetailPage';
+import BuyProductsPage from './features/customer-portal/pages/BuyProductsPage';
 import InventoryListPage from './features/inventory/pages/InventoryListPage';
 import FulfillmentDashboardPage from './features/fulfillment/pages/FulfillmentDashboardPage';
 import SubscriptionPlansPage from './features/subscriptions/pages/SubscriptionPlansPage';
@@ -41,41 +42,49 @@ function App() {
         {/* ── Internal authenticated routes ──────────────────────────────── */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            {/* Dashboard Home */}
+            {/* Dashboard Home — ALL internal roles */}
             <Route path="/dashboard" element={<DashboardHome />} />
 
-            {/* Products — ADMIN, SALES_REP, SALES_MANAGER */}
+            {/* Products Catalogue — Read access for SALES_REP, ADMIN, SALES_MANAGER */}
             <Route path="/products" element={<ProductListPage />} />
-            <Route path="/products/new" element={<ProductCreatePage />} />
-            <Route path="/products/:id/edit" element={<ProductEditPage />} />
-            <Route path="/products/pricing-config" element={<PricingConfigPage />} />
 
             {/* Quotations — ADMIN, SALES_REP, SALES_MANAGER */}
             <Route path="/quotations" element={<QuotationListPage />} />
             <Route path="/quotations/new" element={<QuotationCreatePage />} />
             <Route path="/quotations/:id" element={<QuotationDetail />} />
+          </Route>
+        </Route>
 
-            {/* Approvals — ADMIN, SALES_MANAGER, FINANCE_OPERATIONS */}
+        {/* ── Role Restricted Routes: Admin & Sales Manager ──── */}
+        <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'SALES_MANAGER']} />}>
+          <Route element={<AppLayout />}>
+            <Route path="/deal-health" element={<DealHealthDashboardPage />} />
+            <Route path="/products/new" element={<ProductCreatePage />} />
+            <Route path="/products/:id/edit" element={<ProductEditPage />} />
+            <Route path="/products/pricing-config" element={<PricingConfigPage />} />
+            <Route path="/reporting" element={<ReportingDashboardPage />} />
+          </Route>
+        </Route>
+
+        {/* ── Role Restricted Routes: Approvals ───────────────────────────────── */}
+        <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'SALES_MANAGER', 'FINANCE_OPERATIONS']} />}>
+          <Route element={<AppLayout />}>
             <Route path="/approvals" element={<ApprovalDashboardPage />} />
             <Route path="/approvals/dashboard" element={<ApprovalDashboardPage />} />
             <Route path="/approvals/list" element={<ApprovalListPage />} />
             <Route path="/approvals/:id" element={<ApprovalDetailPage />} />
+          </Route>
+        </Route>
 
-            {/* Inventory & Fulfillment */}
+        {/* ── Role Restricted Routes: Operations & Finance Only ──────────────── */}
+        <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'FINANCE_OPERATIONS']} />}>
+          <Route element={<AppLayout />}>
             <Route path="/inventory" element={<InventoryListPage />} />
             <Route path="/fulfillment" element={<FulfillmentDashboardPage />} />
-
-            {/* Subscriptions & Billing */}
             <Route path="/subscriptions" element={<SubscriptionPlansPage />} />
             <Route path="/billing" element={<BillingDashboardPage />} />
-
-            {/* Invoices */}
             <Route path="/invoices" element={<InvoiceListPage />} />
             <Route path="/invoices/:id" element={<InvoiceDetailPage />} />
-
-            {/* Deal Health & Reporting */}
-            <Route path="/deal-health" element={<DealHealthDashboardPage />} />
-            <Route path="/reporting" element={<ReportingDashboardPage />} />
           </Route>
         </Route>
 
@@ -84,6 +93,7 @@ function App() {
 
         <Route element={<CustomerPortalRoute />}>
           <Route path="/portal" element={<PortalDashboardPage />} />
+          <Route path="/portal/buy" element={<BuyProductsPage />} />
           <Route path="/portal/quotations/:id" element={<QuotationDetailPage />} />
         </Route>
 

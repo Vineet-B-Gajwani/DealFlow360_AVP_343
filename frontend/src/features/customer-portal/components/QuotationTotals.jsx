@@ -1,37 +1,31 @@
 import React from 'react';
 
-/**
- * QuotationTotals
- *
- * Displays the financial totals section of a quotation:
- * subtotal, discount, tax, and grand total.
- * Also shows the margin percentage if available.
- *
- * Props:
- *   quotation {object} — From the API contract:
- *     { subtotal, discountTotal, taxTotal, grandTotal, margin }
- */
 function QuotationTotals({ quotation }) {
   if (!quotation) return null;
 
   function fmt(value) {
-    if (value === null || value === undefined) return '—';
+    if (value === null || value === undefined) return '0.00';
     return Number(value).toLocaleString('en-IN', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
   }
 
+  const subTotal = quotation.subTotal ?? quotation.subtotal ?? 0;
+  const discountTotal = quotation.discountTotal ?? 0;
+  const taxTotal = quotation.taxTotal ?? 0;
+  const grandTotal = quotation.grandTotal ?? 0;
+
   const rows = [
-    { id: 'total-subtotal', label: 'Subtotal', value: `₹${fmt(quotation.subtotal)}`, muted: true },
+    { id: 'total-subtotal', label: 'Subtotal', value: `₹${fmt(subTotal)}`, muted: true },
     {
       id: 'total-discount',
       label: 'Discount',
-      value: quotation.discountTotal ? `-₹${fmt(quotation.discountTotal)}` : '—',
+      value: discountTotal ? `-₹${fmt(discountTotal)}` : '₹0.00',
       accent: 'text-emerald-400',
       muted: false,
     },
-    { id: 'total-tax', label: 'Tax', value: `₹${fmt(quotation.taxTotal)}`, muted: true },
+    { id: 'total-tax', label: 'Tax', value: `₹${fmt(taxTotal)}`, muted: true },
   ];
 
   return (
@@ -55,20 +49,9 @@ function QuotationTotals({ quotation }) {
       >
         <span className="text-base font-bold text-white">Grand Total</span>
         <span className="text-xl font-bold text-brand-400">
-          ₹{fmt(quotation.grandTotal)}
+          ₹{fmt(grandTotal)}
         </span>
       </div>
-
-      {/* Margin — internal context, shown to customer for transparency */}
-      {quotation.margin !== undefined && quotation.margin !== null && (
-        <div
-          id="total-margin"
-          className="mt-3 pt-3 border-t border-slate-700/40 flex justify-between text-xs"
-        >
-          <span className="text-slate-500">Margin</span>
-          <span className="text-slate-400">{quotation.margin}%</span>
-        </div>
-      )}
     </div>
   );
 }

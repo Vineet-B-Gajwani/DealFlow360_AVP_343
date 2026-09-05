@@ -23,12 +23,16 @@ function ReportingDashboardPage() {
 
   const handleExport = async (type) => {
     try {
-      const res = await reportingApi.exportReport();
-      const blob = new Blob([res.data], { type: 'text/csv' });
+      const res = await reportingApi.exportReport({ format: type });
+      const isPdf = type === 'PDF';
+      const mimeType = isPdf ? 'application/pdf' : 'text/csv';
+      const fileExt = isPdf ? 'pdf' : 'csv';
+
+      const blob = new Blob([res.data], { type: mimeType });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `dealflow360_report_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `dealflow360_executive_report_${new Date().toISOString().split('T')[0]}.${fileExt}`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -55,11 +59,17 @@ function ReportingDashboardPage() {
             <p className="text-slate-400 text-sm mt-1">Real-time MongoDB aggregation metrics for pipeline, billing, and payments.</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => handleExport('PDF')} className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded text-sm font-medium border border-slate-700">
-              Export PDF
+            <button
+              onClick={() => handleExport('PDF')}
+              className="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-brand-600/20 transition-all flex items-center gap-1.5"
+            >
+              📄 Export PDF Report
             </button>
-            <button onClick={() => handleExport('XLS')} className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded text-sm font-medium border border-slate-700">
-              Export Excel
+            <button
+              onClick={() => handleExport('XLS')}
+              className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 transition-colors flex items-center gap-1.5"
+            >
+              📊 Export Excel (CSV)
             </button>
           </div>
         </div>
@@ -68,20 +78,20 @@ function ReportingDashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
             <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Total Pipeline Value</div>
-            <div className="text-3xl font-bold font-mono text-brand-400">₹{Number(overview.pipelineValue || 0).toLocaleString()}</div>
+            <div className="text-3xl font-bold font-mono text-brand-400">₹{Number(overview.pipelineValue || 0).toLocaleString('en-IN')}</div>
             <div className="text-xs text-slate-500 mt-2">{overview.quotationsCount || 0} Total Quotations</div>
           </div>
 
           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
             <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Total Invoiced</div>
-            <div className="text-3xl font-bold font-mono text-purple-400">₹{Number(overview.totalInvoiced || 0).toLocaleString()}</div>
+            <div className="text-3xl font-bold font-mono text-purple-400">₹{Number(overview.totalInvoiced || 0).toLocaleString('en-IN')}</div>
             <div className="text-xs text-slate-500 mt-2">{overview.invoicesCount || 0} Total Invoices</div>
           </div>
 
           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
             <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Collected Payments</div>
-            <div className="text-3xl font-bold font-mono text-emerald-400">₹{Number(overview.totalCollected || 0).toLocaleString()}</div>
-            <div className="text-xs text-slate-500 mt-2">Outstanding AR: ₹{Number(overview.outstandingAR || 0).toLocaleString()}</div>
+            <div className="text-3xl font-bold font-mono text-emerald-400">₹{Number(overview.totalCollected || 0).toLocaleString('en-IN')}</div>
+            <div className="text-xs text-slate-500 mt-2">Outstanding AR: ₹{Number(overview.outstandingAR || 0).toLocaleString('en-IN')}</div>
           </div>
         </div>
 
@@ -91,11 +101,11 @@ function ReportingDashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div className="p-4 bg-slate-950/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
               <span className="text-slate-400">Average Discount Value per Quote</span>
-              <span className="font-mono font-bold text-amber-400">₹{Number(analytics.avgDiscountValue || 0).toLocaleString()}</span>
+              <span className="font-mono font-bold text-amber-400">₹{Number(analytics.avgDiscountValue || 0).toLocaleString('en-IN')}</span>
             </div>
             <div className="p-4 bg-slate-950/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
               <span className="text-slate-400">Average Invoice Amount</span>
-              <span className="font-mono font-bold text-brand-400">₹{Number(analytics.avgInvoiceValue || 0).toLocaleString()}</span>
+              <span className="font-mono font-bold text-brand-400">₹{Number(analytics.avgInvoiceValue || 0).toLocaleString('en-IN')}</span>
             </div>
           </div>
         </div>

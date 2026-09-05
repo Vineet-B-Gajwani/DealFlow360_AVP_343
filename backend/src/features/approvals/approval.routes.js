@@ -98,4 +98,15 @@ router.post(
   approvalController.returnForRevision
 );
 
+// POST /api/approvals/:id/escalate — Escalate to Finance
+router.post(
+  '/:id/escalate',
+  authenticate,
+  roleCheck(['SALES_MANAGER', 'ADMIN']),
+  validateMongoId,
+  validateAction,
+  preventSelfApproval,
+  approvalController.escalateApproval
+);
+
 module.exports = router;

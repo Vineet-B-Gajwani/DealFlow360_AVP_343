@@ -41,7 +41,8 @@ async function createQuotation(data, actingUser) {
   const quotation = new Quotation({
     quotationNumber,
     customerId: customer._id,
-    salesRepId: actingUser.id,
+    salesRepId: actingUser?.id || actingUser?._id || data.salesRepId,
+    quotationRequestId: data.quotationRequestId || null,
     notes: data.notes || '',
   });
 
@@ -52,7 +53,7 @@ async function createQuotation(data, actingUser) {
 /**
  * Add a line to a quotation
  */
-async function addQuotationLine(quotationId, { productId, quantity, discount = 0 }) {
+async function addQuotationLine(quotationId, { productId, quantity, discount = 0, discountPercent }) {
   const quotation = await Quotation.findById(quotationId);
   if (!quotation) throw makeError('Quotation not found', 404);
   if (quotation.status !== QUOTATION_STATUS.DRAFT && quotation.status !== QUOTATION_STATUS.NEGOTIATING) {
@@ -62,22 +63,84 @@ async function addQuotationLine(quotationId, { productId, quantity, discount = 0
   const product = await Product.findById(productId);
   if (!product) throw makeError('Product not found', 404);
 
-  // Snapshot price and calculate total
+  // Determine percentage discount and absolute discount amount
+  const lineQty = Math.max(1, parseInt(quantity || 1, 10));
   const unitPrice = product.basePrice;
-  const lineSubtotal = unitPrice * quantity;
-  const lineDiscountVal = (lineSubtotal * discount) / 100;
-  const total = lineSubtotal - lineDiscountVal;
+  const lineSubtotal = unitPrice * lineQty;
+
+  let finalDiscPercent = 0;
+  let lineDiscountVal = 0;
+
+  if (discountPercent !== undefined && discountPercent !== null) {
+    finalDiscPercent = parseFloat(discountPercent) || 0;
+    lineDiscountVal = (lineSubtotal * finalDiscPercent) / 100;
+  } else {
+    // If discount was passed as percent or absolute value:
+    if (discount <= 100 && discount > 0) {
+      finalDiscPercent = parseFloat(discount);
+      lineDiscountVal = (lineSubtotal * finalDiscPercent) / 100;
+    } else {
+      lineDiscountVal = parseFloat(discount) || 0;
+      finalDiscPercent = lineSubtotal > 0 ? (lineDiscountVal / lineSubtotal) * 100 : 0;
+    }
+  }
+
+  const total = Math.max(0, lineSubtotal - lineDiscountVal);
 
   quotation.lines.push({
     productId,
-    quantity,
+    quantity: lineQty,
     unitPrice,
-    discount: lineDiscountVal, // Store absolute discount
+    discount: lineDiscountVal,
+    discountPercent: parseFloat(finalDiscPercent.toFixed(2)),
     total,
   });
 
   await quotation.save();
-  return quotation;
+  return await getQuotationById(quotation._id);
+}
+
+/**
+ * Update an existing quotation line (Qty, Discount %)
+ */
+async function updateQuotationLine(quotationId, lineId, { quantity, discountPercent }) {
+  const quotation = await Quotation.findById(quotationId);
+  if (!quotation) throw makeError('Quotation not found', 404);
+  if (quotation.status !== QUOTATION_STATUS.DRAFT && quotation.status !== QUOTATION_STATUS.NEGOTIATING) {
+    throw makeError(`Cannot update lines of a quotation in ${quotation.status} state`, 400);
+  }
+
+  const line = quotation.lines.id(lineId);
+  if (!line) throw makeError('Line item not found', 404);
+
+  if (quantity !== undefined && quantity !== null) {
+    line.quantity = Math.max(1, parseInt(quantity, 10));
+  }
+
+  if (discountPercent !== undefined && discountPercent !== null) {
+    line.discountPercent = Math.min(100, Math.max(0, parseFloat(discountPercent)));
+  }
+
+  const lineSubtotal = line.unitPrice * line.quantity;
+  line.discount = (lineSubtotal * (line.discountPercent || 0)) / 100;
+  line.total = Math.max(0, lineSubtotal - line.discount);
+
+  await quotation.save();
+  return await getQuotationById(quotation._id);
+}
+
+/**
+ * Update quotation metadata (priceList, notes)
+ */
+async function updateQuotation(quotationId, { priceList, notes }) {
+  const quotation = await Quotation.findById(quotationId);
+  if (!quotation) throw makeError('Quotation not found', 404);
+
+  if (priceList !== undefined) quotation.priceList = priceList;
+  if (notes !== undefined) quotation.notes = notes;
+
+  await quotation.save();
+  return await getQuotationById(quotation._id);
 }
 
 /**
@@ -132,21 +195,21 @@ async function submitQuotation(quotationId, actingUser) {
     }
   }
 
-  // If requires approval, transition to PENDING_APPROVAL and call ApprovalService
-  if (requiredLevel !== REQUIRED_LEVEL.NONE) {
-    quotation.status = QUOTATION_STATUS.PENDING_APPROVAL;
-    await quotation.save();
-
-    await approvalService.createApproval({
-      quotationId: quotation._id.toString(),
-      riskScore: Math.round(totalExcessDiscount), // Blended excess risk
-      requiredLevel,
-      requestedBy: actingUser.id,
-    }, actingUser);
-  } else {
-    quotation.status = QUOTATION_STATUS.APPROVED;
-    await quotation.save();
+  // Submitting a quotation always requires at least Sales Manager approval (or FINANCE if high discount rule applies)
+  if (requiredLevel === REQUIRED_LEVEL.NONE) {
+    requiredLevel = REQUIRED_LEVEL.SALES_MANAGER;
   }
+
+  // Transition to PENDING_APPROVAL and create approval request
+  quotation.status = QUOTATION_STATUS.PENDING_APPROVAL;
+  await quotation.save();
+
+  await approvalService.createApproval({
+    quotationId: quotation._id.toString(),
+    riskScore: Math.round(totalExcessDiscount), // Blended excess risk
+    requiredLevel,
+    requestedBy: actingUser?.id || actingUser?._id || quotation.salesRepId?.toString(),
+  }, actingUser);
 
   return quotation;
 }
@@ -265,9 +328,67 @@ async function getQuotations(query = {}) {
  * Get quotation by id
  */
 async function getQuotationById(id) {
-  const quotation = await Quotation.findById(id).populate('lines.productId');
+  const quotation = await Quotation.findById(id)
+    .populate({
+      path: 'customerId',
+      populate: { path: 'userId', select: 'name email' },
+    })
+    .populate({
+      path: 'quotationRequestId',
+      populate: { path: 'items.productId' },
+    })
+    .populate('lines.productId');
+
   if (!quotation) throw makeError('Quotation not found', 404);
-  return quotation;
+
+  const customerTier = quotation.customerId?.tier || 'Standard';
+
+  // Fetch ALL Discount Rules for all tiers
+  const allRules = await DiscountRule.find({});
+  const rulesByTierAndCategory = {};
+  for (const rule of allRules) {
+    if (!rulesByTierAndCategory[rule.tier]) {
+      rulesByTierAndCategory[rule.tier] = {};
+    }
+    rulesByTierAndCategory[rule.tier][rule.category] = rule.maxDiscountPercent;
+  }
+
+  const rulesByCategory = rulesByTierAndCategory[customerTier] || {};
+
+  // Format response JSON with limitPercent and live status
+  const quotObj = quotation.toObject();
+  quotObj.discountRules = rulesByTierAndCategory;
+  
+  quotObj.lines = (quotObj.lines || []).map((line) => {
+    if (!line) return line;
+    const category = line.productId?.category || 'Hardware';
+    const lineSubtotal = (line.unitPrice || 0) * (line.quantity || 1);
+    
+    // Ensure discountPercent is computed if missing
+    let discPercent = line.discountPercent;
+    if (discPercent === undefined || discPercent === null) {
+      discPercent = lineSubtotal > 0 ? ((line.discount || 0) / lineSubtotal) * 100 : 0;
+    }
+    discPercent = parseFloat(Number(discPercent || 0).toFixed(1));
+
+    // Limit percent from discount rule or default fallback
+    const limitPercent = rulesByCategory[category] !== undefined 
+      ? rulesByCategory[category] 
+      : (category === 'Service' ? 10 : 15);
+
+    const excess = discPercent - limitPercent;
+    const status = excess > 0 ? `OVER (+${Math.round(excess)}pt)` : 'OK';
+
+    return {
+      ...line,
+      discountPercent: discPercent,
+      limitPercent,
+      status,
+      isOverLimit: excess > 0,
+    };
+  });
+
+  return quotObj;
 }
 
 /**
@@ -319,12 +440,14 @@ async function removeQuotationLine(quotationId, lineId) {
   
   quotation.lines = quotation.lines.filter(l => l._id.toString() !== lineId);
   await quotation.save();
-  return quotation;
+  return await getQuotationById(quotation._id);
 }
 
 module.exports = {
   createQuotation,
   addQuotationLine,
+  updateQuotationLine,
+  updateQuotation,
   submitQuotation,
   confirmQuotation,
   getQuotations,

@@ -4,6 +4,7 @@ import {
   approveApproval,
   rejectApproval,
   returnForRevision,
+  escalateApproval,
 } from '../api/approvalApi';
 
 /**
@@ -35,7 +36,7 @@ export function useApproval(id) {
 
   useEffect(() => { load(); }, [load]);
 
-  /** Generic action executor — wraps approve/reject/revision calls. */
+  /** Generic action executor — wraps approve/reject/revision/escalate calls. */
   const runAction = useCallback(async (apiFn, reason) => {
     setActionLoading(true);
     setActionError(null);
@@ -55,6 +56,7 @@ export function useApproval(id) {
   const approve  = (reason) => runAction(approveApproval, reason);
   const reject   = (reason) => runAction(rejectApproval, reason);
   const revision = (reason) => runAction(returnForRevision, reason);
+  const escalate = (reason) => runAction(escalateApproval, reason);
 
   return {
     approval,
@@ -66,5 +68,6 @@ export function useApproval(id) {
     approve,
     reject,
     revision,
+    escalate,
   };
 }

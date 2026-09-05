@@ -10,6 +10,7 @@ const ACTION_STYLE = {
   REJECTED:          { icon: '❌', cls: 'text-red-400',     label: 'Rejected'          },
   REVISION_REQUIRED: { icon: '↩', cls: 'text-violet-400',  label: 'Revision Required' },
   RESUBMITTED:       { icon: '🔄', cls: 'text-brand-400',   label: 'Resubmitted'       },
+  ESCALATED:         { icon: '🏛️', cls: 'text-amber-400',    label: 'Escalated to Finance' },
 };
 
 export default function ApprovalHistory({ history = [] }) {

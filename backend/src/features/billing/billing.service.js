@@ -112,7 +112,7 @@ async function cancelSubscription(id, cancelDateStr) {
     subscription,
     proration: {
       refundAmount,
-      currency: 'USD', // Assumed default
+      currency: 'INR', // Assumed default
     }
   };
 }
@@ -123,7 +123,10 @@ async function cancelSubscription(id, cancelDateStr) {
  */
 async function listSubscriptions(query = {}) {
   const { limit, skip, ...filters } = query;
-  const cursor = Subscription.find(filters);
+  const cursor = Subscription.find(filters)
+    .populate('subscriptionPlanId')
+    .populate('productId')
+    .populate('quotationId');
   if (skip) cursor.skip(parseInt(skip, 10));
   if (limit) cursor.limit(parseInt(limit, 10));
   return await cursor.exec();
@@ -197,7 +200,7 @@ async function updateSubscription(id, updateData, changeDateStr) {
     subscription,
     proration: {
       creditAmount: prorationCredit,
-      currency: 'USD',
+      currency: 'INR',
     }
   };
 }

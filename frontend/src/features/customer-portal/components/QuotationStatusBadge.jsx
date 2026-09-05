@@ -10,7 +10,7 @@ const STATUS_CONFIG = {
     dot: 'bg-slate-400',
   },
   PENDING_APPROVAL: {
-    label: 'Pending Approval',
+    label: 'Waiting for Final Approval',
     className: 'qstatus-pending',
     dot: 'bg-amber-400',
   },

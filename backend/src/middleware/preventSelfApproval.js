@@ -12,7 +12,7 @@ module.exports = async function preventSelfApproval(req, res, next) {
     if (!approval) {
       return res.status(404).json({ success: false, message: 'Approval not found' });
     }
-    if (approval.requestedBy && approval.requestedBy.toString() === req.user.id.toString()) {
+    if (approval.requestedBy && req.user?.id && approval.requestedBy.toString() === req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: 'You cannot act on an approval you created',

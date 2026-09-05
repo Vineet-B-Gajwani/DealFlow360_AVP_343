@@ -1,28 +1,50 @@
 import { useState } from 'react';
+import useAuth from '../../auth/hooks/useAuth';
 
 /**
- * ActionPanel — shows Approve / Reject / Return for Revision buttons.
+ * ActionPanel — shows Approve / Reject / Return for Revision / Escalate buttons.
  * Only displayed when the approval status is PENDING.
- *
- * @param {{ onApprove, onReject, onRevision, loading }} props
  */
-export default function ActionPanel({ onApprove, onReject, onRevision, loading }) {
+export default function ActionPanel({ approval, onApprove, onReject, onRevision, onEscalate, loading }) {
+  const { user } = useAuth();
   const [reason, setReason] = useState('');
-  const [active, setActive] = useState(null); // 'approve' | 'reject' | 'revision'
+  const [active, setActive] = useState(null); // 'approve' | 'reject' | 'revision' | 'escalate'
 
   const handleSubmit = async (type) => {
     if (type === 'approve') await onApprove(reason);
     if (type === 'reject')  await onReject(reason);
     if (type === 'revision') await onRevision(reason);
+    if (type === 'escalate') await onEscalate(reason);
     setReason('');
     setActive(null);
   };
 
+  const isSalesRep = user?.role === 'SALES_REP';
+  const isSalesManager = user?.role === 'SALES_MANAGER' || user?.role === 'ADMIN';
+  const isFinance = user?.role === 'FINANCE_OPERATIONS' || user?.role === 'ADMIN';
+
+  if (isSalesRep) {
+    return (
+      <div className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-5 text-amber-200 text-sm flex items-center gap-3">
+        <span className="text-xl">⏳</span>
+        <div>
+          <span className="font-bold block text-white">Sent to Sales Manager for Approval</span>
+          <span>Sales Representatives cannot approve requests. Awaiting decision from Sales Manager or Finance.</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 space-y-4">
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
-        Reviewer Action
-      </h3>
+      <div className="flex justify-between items-center">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+          Reviewer Action Panel
+        </h3>
+        <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
+          Active Level: {approval?.currentLevel || 'SALES_MANAGER'}
+        </span>
+      </div>
 
       {/* Reason textarea — shown when an action is selected */}
       {active && (
@@ -40,6 +62,8 @@ export default function ActionPanel({ onApprove, onReject, onRevision, loading }
                 ? 'Add an approval note…'
                 : active === 'reject'
                 ? 'State the reason for rejection…'
+                : active === 'escalate'
+                ? 'Reason for escalating to Finance Department…'
                 : 'Describe what needs to be revised…'
             }
             className="w-full resize-none rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
@@ -56,7 +80,7 @@ export default function ActionPanel({ onApprove, onReject, onRevision, loading }
             disabled={loading}
             className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 transition-colors disabled:opacity-50"
           >
-            ✓ Approve
+            ✓ {isFinance && approval?.currentLevel === 'FINANCE' ? 'Approve (Finance)' : 'Approve'}
           </button>
         ) : (
           <button
@@ -109,6 +133,29 @@ export default function ActionPanel({ onApprove, onReject, onRevision, loading }
           >
             {loading ? <Spinner /> : '↩ Confirm Revision Request'}
           </button>
+        )}
+
+        {/* Escalate to Finance — for Sales Managers */}
+        {isSalesManager && approval?.currentLevel !== 'FINANCE' && (
+          active !== 'escalate' ? (
+            <button
+              id="btn-escalate"
+              onClick={() => setActive('escalate')}
+              disabled={loading}
+              className="inline-flex items-center gap-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50"
+            >
+              🏛️ Escalate to Finance Department
+            </button>
+          ) : (
+            <button
+              id="btn-escalate-confirm"
+              onClick={() => handleSubmit('escalate')}
+              disabled={loading}
+              className="inline-flex items-center gap-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50"
+            >
+              {loading ? <Spinner /> : '🏛️ Confirm Escalation to Finance'}
+            </button>
+          )
         )}
 
         {/* Cancel */}

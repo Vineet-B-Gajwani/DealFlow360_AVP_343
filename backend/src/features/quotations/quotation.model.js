@@ -47,6 +47,12 @@ const quotationLineSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    discountPercent: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+    },
     total: {
       type: Number,
       required: true,
@@ -77,6 +83,15 @@ const quotationSchema = new mongoose.Schema(
       ref: 'User',
       required: [true, 'Sales Rep is required'],
       index: true,
+    },
+    priceList: {
+      type: String,
+      default: 'Standard Price List',
+    },
+    quotationRequestId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'QuotationRequest',
+      default: null,
     },
     status: {
       type: String,

@@ -1,11 +1,11 @@
-import axios from 'axios';
+import apiClient from '../../auth/api/auth.api';
 
-const API_BASE = '/api/deal-health';
+const API_BASE = '/deal-health';
 
 const dealHealthApi = {
-  getAlerts: () => axios.get(`${API_BASE}/alerts`),
-  triggerScan: () => axios.post(`${API_BASE}/scan`),
-  updateStatus: (id, status) => axios.patch(`${API_BASE}/alerts/${id}/status`, { status }),
+  getAlerts: () => apiClient.get(`${API_BASE}/alerts`),
+  triggerScan: () => apiClient.post(`${API_BASE}/scan`),
+  updateStatus: (id, status) => apiClient.patch(`${API_BASE}/alerts/${id}/status`, { status }),
 };
 
 export default dealHealthApi;

@@ -1,10 +1,11 @@
-import axios from 'axios';
+import apiClient from '../../auth/api/auth.api';
 
-const API_BASE = '/api/reporting';
+const API_BASE = '/reporting';
 
 const reportingApi = {
-  getSummary: (params) => axios.get(`${API_BASE}/summary`, { params }),
-  exportReport: (params) => axios.get(`${API_BASE}/export`, { params, responseType: 'blob' }),
+  getSummary: (params) => apiClient.get(`${API_BASE}/summary`, { params }),
+  getDashboard: (params) => apiClient.get(`${API_BASE}/summary`, { params }),
+  exportReport: (params) => apiClient.get(`${API_BASE}/export`, { params, responseType: 'blob' }),
 };
 
 export default reportingApi;

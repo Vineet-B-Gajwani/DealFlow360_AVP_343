@@ -2,6 +2,7 @@
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { User } = require('./auth.model');
 const { Customer } = require('../customer-portal/customer.model');
 
 const SALT_ROUNDS = 12;
@@ -50,8 +51,10 @@ async function register({
   taxId,
   proofDocId,
 }) {
+  const cleanEmail = (email || '').trim().toLowerCase();
+
   // Check for existing email
-  const existing = await User.findOne({ email });
+  const existing = await User.findOne({ email: cleanEmail });
   if (existing) {
     const err = new Error('An account with this email already exists');
     err.statusCode = 409;
@@ -62,7 +65,7 @@ async function register({
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
   // Create user identity
-  const user = await User.create({ name, email, passwordHash, role });
+  const user = await User.create({ name, email: cleanEmail, passwordHash, role });
 
   // If registering as a CUSTOMER, create customer business profile record
   if (role === 'CUSTOMER') {
@@ -102,8 +105,10 @@ async function register({
  * Returns the user (without passwordHash) plus token pair.
  */
 async function login({ email, password, role }) {
+  const cleanEmail = (email || '').trim().toLowerCase();
+
   // Explicitly select passwordHash (excluded by default)
-  const user = await User.findOne({ email }).select('+passwordHash +refreshToken');
+  const user = await User.findOne({ email: cleanEmail }).select('+passwordHash +refreshToken');
 
   if (!user) {
     const err = new Error('Invalid email or password');
@@ -193,7 +198,9 @@ async function refreshTokens(incomingRefreshToken) {
  * Logout — nullify the stored refresh token so it can never be reused.
  */
 async function logout(userId) {
-  await User.findByIdAndUpdate(userId, { refreshToken: null });
+  if (userId) {
+    await User.findByIdAndUpdate(userId, { refreshToken: null });
+  }
 }
 
 /**
@@ -203,7 +210,7 @@ async function getMe(userId) {
   const user = await User.findById(userId);
   if (!user) {
     const err = new Error('User not found');
-    err.statusCode = 404;
+    err.statusCode = 401; // Return 401 so frontend clears stale token
     throw err;
   }
   return sanitizeUser(user);

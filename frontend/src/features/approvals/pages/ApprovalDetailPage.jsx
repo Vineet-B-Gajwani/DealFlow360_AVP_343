@@ -22,6 +22,7 @@ export default function ApprovalDetailPage() {
     approve,
     reject,
     revision,
+    escalate,
   } = useApproval(id);
 
   // ── Loading ──────────────────────────────────────────────────────────────
@@ -111,9 +112,11 @@ export default function ApprovalDetailPage() {
         {/* ── Reviewer action panel (only when PENDING) ── */}
         {isPending && (
           <ActionPanel
+            approval={approval}
             onApprove={approve}
             onReject={reject}
             onRevision={revision}
+            onEscalate={escalate}
             loading={actionLoading}
           />
         )}

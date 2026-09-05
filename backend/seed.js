@@ -320,7 +320,7 @@ async function seed() {
   await PriceList.create({
     name: 'Gold Tier 2026',
     tier: 'Gold',
-    currency: 'USD',
+    currency: 'INR',
     isActive: true,
     productOverrides: [
       { productId: hardwareProduct._id, overridePrice: 4800 },
@@ -331,7 +331,7 @@ async function seed() {
   await PriceList.create({
     name: 'Platinum Tier 2026',
     tier: 'Platinum',
-    currency: 'USD',
+    currency: 'INR',
     isActive: true,
     productOverrides: [
       { productId: hardwareProduct._id, overridePrice: 4500 },

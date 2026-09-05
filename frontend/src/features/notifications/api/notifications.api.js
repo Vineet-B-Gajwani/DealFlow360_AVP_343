@@ -1,10 +1,10 @@
-import axios from 'axios';
+import apiClient from '../../auth/api/auth.api';
 
-const API_BASE = '/api/notifications';
+const API_BASE = '/notifications';
 
 const notificationsApi = {
-  getNotifications: () => axios.get(API_BASE),
-  markAsRead: (id) => axios.patch(`${API_BASE}/${id}/read`),
+  getNotifications: () => apiClient.get(API_BASE),
+  markAsRead: (id) => apiClient.patch(`${API_BASE}/${id}/read`),
 };
 
 export default notificationsApi;

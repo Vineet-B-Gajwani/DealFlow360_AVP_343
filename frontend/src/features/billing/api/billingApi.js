@@ -1,23 +1,18 @@
-import axios from 'axios';
+import apiClient from '../../auth/api/auth.api';
 
-const BASE = '/api/billing/subscriptions';
-
-function authHeader() {
-  const token = localStorage.getItem('accessToken');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
+const BASE = '/billing/subscriptions';
 
 export const fetchBillingSubscriptions = async (params = {}) => {
-  const { data } = await axios.get(BASE, { params, headers: authHeader() });
+  const { data } = await apiClient.get(BASE, { params });
   return data;
 };
 
 export const createBillingSubscription = async (payload) => {
-  const { data } = await axios.post(BASE, payload, { headers: authHeader() });
+  const { data } = await apiClient.post(BASE, payload);
   return data;
 };
 
 export const cancelBillingSubscription = async (id, payload) => {
-  const { data } = await axios.post(`${BASE}/${id}/cancel`, payload, { headers: authHeader() });
+  const { data } = await apiClient.post(`${BASE}/${id}/cancel`, payload);
   return data;
 };

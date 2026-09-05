@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import StatusToggle from './StatusToggle';
+import useAuth from '../../auth/hooks/useAuth';
 
 const TYPE_COLORS = {
   PRODUCT: 'bg-blue-900/40 text-blue-300 border-blue-700/40',
@@ -14,17 +15,10 @@ const TYPE_LABELS = {
   SUBSCRIPTION: 'Subscription',
 };
 
-/**
- * ProductTable
- *
- * Renders the product list as a premium dark-mode data table.
- *
- * Props:
- *   products    {Product[]}          Data rows
- *   onToggle    {function}           (product) => void — called on status toggle
- *   isToggling  {string|null}        ID of the product currently being toggled
- */
 function ProductTable({ products, onToggle, isToggling }) {
+  const { user } = useAuth();
+  const canEdit = user?.role === 'ADMIN' || user?.role === 'SALES_MANAGER';
+
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -63,9 +57,11 @@ function ProductTable({ products, onToggle, isToggling }) {
             <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-400">
               Status
             </th>
-            <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Actions
-            </th>
+            {canEdit && (
+              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Actions
+              </th>
+            )}
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-800/60">
@@ -114,30 +110,40 @@ function ProductTable({ products, onToggle, isToggling }) {
                 {product.taxRate ?? 0}%
               </td>
 
-              {/* Status toggle */}
+              {/* Status toggle / badge */}
               <td className="px-4 py-3 text-center">
-                <StatusToggle
-                  id={`product-toggle-${product._id}`}
-                  isActive={product.isActive}
-                  onToggle={() => onToggle(product)}
-                  isDisabled={isToggling === product._id}
-                />
+                {canEdit ? (
+                  <StatusToggle
+                    id={`product-toggle-${product._id}`}
+                    isActive={product.isActive}
+                    onToggle={() => onToggle(product)}
+                    isDisabled={isToggling === product._id}
+                  />
+                ) : (
+                  <span className={`px-2 py-0.5 rounded text-[11px] font-bold font-mono ${
+                    product.isActive ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-slate-400'
+                  }`}>
+                    {product.isActive ? 'ACTIVE' : 'INACTIVE'}
+                  </span>
+                )}
               </td>
 
               {/* Actions */}
-              <td className="px-4 py-3 text-right">
-                <Link
-                  to={`/products/${product._id}/edit`}
-                  id={`product-edit-${product._id}`}
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700/70 border border-slate-700/50 hover:border-slate-600 transition-all duration-150"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  Edit
-                </Link>
-              </td>
+              {canEdit && (
+                <td className="px-4 py-3 text-right">
+                  <Link
+                    to={`/products/${product._id}/edit`}
+                    id={`product-edit-${product._id}`}
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700/70 border border-slate-700/50 hover:border-slate-600 transition-all duration-150"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Edit
+                  </Link>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

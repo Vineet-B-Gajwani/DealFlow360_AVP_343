@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PortalHeader from '../components/PortalHeader';
 import CustomerIdentityCard from '../components/CustomerIdentityCard';
 import PortalStatusCard from '../components/PortalStatusCard';
@@ -28,15 +29,23 @@ function PortalDashboardPage() {
         <div className="portal-container">
 
           {/* Page heading */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-white">
-              {profile?.identity?.name
-                ? `Welcome back, ${profile.identity.name.split(' ')[0]}`
-                : 'Your Portal'}
-            </h1>
-            <p className="text-slate-400 text-sm mt-1">
-              Manage your account and track your quotations
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-white">
+                {profile?.identity?.name
+                  ? `Welcome back, ${profile.identity.name.split(' ')[0]}`
+                  : 'Your Portal'}
+              </h1>
+              <p className="text-slate-400 text-sm mt-1">
+                Manage your account, view quotations, and request new products
+              </p>
+            </div>
+            <Link
+              to="/portal/buy"
+              className="px-5 py-2.5 bg-brand-500 hover:bg-brand-400 text-white font-semibold text-sm rounded-xl shadow-lg shadow-brand-500/20 inline-flex items-center gap-2 transition-all"
+            >
+              <span>🛒</span> Request New Products / Buy
+            </Link>
           </div>
 
           {/* Loading state */}

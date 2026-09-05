@@ -13,7 +13,7 @@ const ALL_MODULES = [
   { name: 'Subscriptions', path: '/subscriptions', roles: ['ADMIN', 'FINANCE_OPERATIONS'] },
   { name: 'Billing', path: '/billing', roles: ['ADMIN', 'FINANCE_OPERATIONS'] },
   { name: 'Invoices', path: '/invoices', roles: ['ADMIN', 'FINANCE_OPERATIONS'] },
-  { name: 'Deal Health', path: '/deal-health', roles: ['ADMIN', 'SALES_REP', 'SALES_MANAGER'] },
+  { name: 'Deal Health', path: '/deal-health', roles: ['ADMIN', 'SALES_MANAGER'] },
   { name: 'Reporting', path: '/reporting', roles: ['ADMIN', 'SALES_MANAGER'] },
 ];
 
@@ -27,6 +27,7 @@ function Sidebar() {
   return (
     <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col hidden md:flex h-full">
       <div className="h-16 flex items-center px-6 border-b border-slate-800">
+        <img src="/logo.jpg" alt="DealFlow360 Logo" className="w-8 h-8 rounded-lg mr-3 object-cover shadow-sm" />
         <h1 className="text-xl font-bold text-white tracking-wide">
           DealFlow<span className="text-brand-500">360</span>
         </h1>

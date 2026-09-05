@@ -1,12 +1,14 @@
-import axios from 'axios';
+import apiClient from '../../auth/api/auth.api';
 
-const API_BASE = '/api/portal/negotiations';
+const API_BASE = '/negotiation';
 
 const negotiationApi = {
-  create: (data) => axios.post(API_BASE, data),
-  getHistory: (quotationId) => axios.get(`${API_BASE}/${quotationId}`),
+  create: (data) => apiClient.post(API_BASE, data),
+  getHistory: (quotationId) => apiClient.get(`${API_BASE}/${quotationId}`),
+  getNegotiations: (quotationId) => apiClient.get(`${API_BASE}/${quotationId}`),
+  submitNegotiation: (payload) => apiClient.post(API_BASE, payload),
   confirmQuotation: (quotationId, message) =>
-    axios.post(`${API_BASE}/${quotationId}/confirm`, { message }),
+    apiClient.post(`${API_BASE}/${quotationId}/confirm`, { message }),
 };
 
 export default negotiationApi;

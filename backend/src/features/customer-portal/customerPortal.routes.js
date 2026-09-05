@@ -62,5 +62,11 @@ router.get('/quotations', authenticate, requireCustomer, controller.getMyQuotati
  */
 router.get('/quotations/:id', authenticate, requireCustomer, controller.getQuotation);
 
+// ── Buy Demand / Quote Request routes ─────────────────────────────────────────
+const requestController = require('../quotations/quotationRequest.controller');
+
+router.post('/quotation-requests', authenticate, requireCustomer, requestController.createCustomerRequest);
+router.get('/quotation-requests', authenticate, requireCustomer, requestController.getCustomerRequests);
+
 module.exports = router;
 

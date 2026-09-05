@@ -1,9 +1,24 @@
 import React from 'react';
 import LoginForm from '../components/LoginForm';
+import { useTheme } from '../../../context/ThemeContext';
 
 function LoginPage() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
-    <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+    <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative">
+      {/* Theme Toggle Top Right */}
+      <div className="absolute top-4 right-4 z-50">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 rounded-lg transition-colors flex items-center gap-1.5 shadow-md"
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+        >
+          <span>{theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}</span>
+        </button>
+      </div>
+
       {/* Decorative gradient blobs */}
       <div
         aria-hidden="true"
@@ -16,23 +31,11 @@ function LoginPage() {
       <div className="relative w-full max-w-md">
         {/* Logo / Brand */}
         <div className="text-center mb-8">
-          <div
-            className="inline-flex items-center justify-center w-14 h-14 rounded-2xl
-                       bg-brand-600 shadow-lg shadow-brand-900/50 mb-4"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-7 h-7 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-            </svg>
-          </div>
+          <img
+            src="/logo.jpg"
+            alt="DealFlow360 Logo"
+            className="w-16 h-16 rounded-2xl shadow-lg shadow-brand-900/50 mb-4 mx-auto object-cover border border-slate-700/50"
+          />
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
             DealFlow<span className="text-brand-400">360</span>
           </h1>

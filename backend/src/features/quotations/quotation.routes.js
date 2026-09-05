@@ -18,11 +18,23 @@ router.get('/', authenticate, authorize(...ALL_ROLES), controller.getQuotations)
 // GET /api/quotations/customers — must come BEFORE /:id to avoid param collision
 router.get('/customers', authenticate, authorize(...SALES_ROLES), controller.listCustomers);
 
+// ── Customer Product Demands / Quote Requests routes ───────────────────────────
+const requestController = require('./quotationRequest.controller');
+
+router.get('/requests', authenticate, authorize(...SALES_ROLES), requestController.getPendingRequests);
+router.post('/requests/:id/convert', authenticate, authorize(...SALES_ROLES), requestController.convertRequestToQuotation);
+
 // GET /api/quotations/:id
 router.get('/:id', authenticate, authorize(...ALL_ROLES), controller.getQuotationById);
 
+// PUT /api/quotations/:id
+router.put('/:id', authenticate, authorize(...SALES_ROLES), controller.updateQuotation);
+
 // POST /api/quotations/:id/lines
 router.post('/:id/lines', authenticate, authorize(...SALES_ROLES), controller.addQuotationLine);
+
+// PUT /api/quotations/:id/lines/:lineId
+router.put('/:id/lines/:lineId', authenticate, authorize(...SALES_ROLES), controller.updateQuotationLine);
 
 // DELETE /api/quotations/:id/lines/:lineId
 router.delete('/:id/lines/:lineId', authenticate, authorize(...SALES_ROLES), controller.removeQuotationLine);

@@ -76,6 +76,24 @@ async function getRecommendations(req, res, next) {
   }
 }
 
+async function updateQuotation(req, res, next) {
+  try {
+    const quotation = await quotationService.updateQuotation(req.params.id, req.body);
+    res.json({ success: true, data: quotation });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function updateQuotationLine(req, res, next) {
+  try {
+    const quotation = await quotationService.updateQuotationLine(req.params.id, req.params.lineId, req.body);
+    res.json({ success: true, data: quotation });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function removeQuotationLine(req, res, next) {
   try {
     const quotation = await quotationService.removeQuotationLine(req.params.id, req.params.lineId);
@@ -89,7 +107,9 @@ module.exports = {
   createQuotation,
   getQuotations,
   getQuotationById,
+  updateQuotation,
   addQuotationLine,
+  updateQuotationLine,
   submitQuotation,
   confirmQuotation,
   listCustomers,

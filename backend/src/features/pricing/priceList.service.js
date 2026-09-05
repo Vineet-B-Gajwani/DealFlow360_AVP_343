@@ -12,7 +12,7 @@ function makeError(message, statusCode = 400) {
 /**
  * Get effective price for a product given a customer tier and currency
  */
-async function getEffectivePrice(productId, tier = 'Standard', currency = 'USD') {
+async function getEffectivePrice(productId, tier = 'Standard', currency = 'INR') {
   const product = await Product.findById(productId);
   if (!product) throw makeError('Product not found', 404);
 

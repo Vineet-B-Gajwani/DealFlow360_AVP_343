@@ -1,80 +1,43 @@
-import axios from 'axios';
+import apiClient from '../../auth/api/auth.api';
 
-const BASE = '/api/approvals';
+const BASE = '/approvals';
 
-/** Attach the stored JWT to every request. */
-function authHeader() {
-  const token = localStorage.getItem('accessToken');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
-/**
- * Submit a new approval request.
- * @param {{ quotationId: string, riskScore: number, requiredLevel: string, requestedBy: string }} payload
- */
 export const createApproval = async (payload) => {
-  const { data } = await axios.post(BASE, payload, { headers: authHeader() });
+  const { data } = await apiClient.post(BASE, payload);
   return data;
 };
 
-/**
- * List approvals — optional query filters.
- * @param {{ status?: string, quotationId?: string }} [params]
- */
 export const fetchApprovals = async (params = {}) => {
-  const { data } = await axios.get(BASE, { params, headers: authHeader() });
-  return data; // { success, count, data: [] }
+  const { data } = await apiClient.get(BASE, { params });
+  return data;
 };
 
-/**
- * Fetch a single approval by ID.
- * @param {string} id
- */
 export const fetchApproval = async (id) => {
-  const { data } = await axios.get(`${BASE}/${id}`, { headers: authHeader() });
-  return data; // { success, data: {} }
+  const { data } = await apiClient.get(`${BASE}/${id}`);
+  return data;
 };
 
-/**
- * Approve an approval.
- * @param {string} id
- * @param {{ reason?: string }} [payload]
- */
 export const approveApproval = async (id, payload = {}) => {
-  const { data } = await axios.post(`${BASE}/${id}/approve`, payload, {
-    headers: authHeader(),
-  });
+  const { data } = await apiClient.post(`${BASE}/${id}/approve`, payload);
   return data;
 };
 
-/**
- * Reject an approval.
- * @param {string} id
- * @param {{ reason?: string }} [payload]
- */
 export const rejectApproval = async (id, payload = {}) => {
-  const { data } = await axios.post(`${BASE}/${id}/reject`, payload, {
-    headers: authHeader(),
-  });
+  const { data } = await apiClient.post(`${BASE}/${id}/reject`, payload);
   return data;
 };
 
-/**
- * Return an approval for revision.
- * @param {string} id
- * @param {{ reason?: string }} [payload]
- */
 export const returnForRevision = async (id, payload = {}) => {
-  const { data } = await axios.post(`${BASE}/${id}/revision`, payload, {
-    headers: authHeader(),
-  });
+  const { data } = await apiClient.post(`${BASE}/${id}/revision`, payload);
   return data;
 };
 
-/**
- * Fetch approval dashboard summary metrics.
- */
+export const escalateApproval = async (id, payload = {}) => {
+  const { data } = await apiClient.post(`${BASE}/${id}/escalate`, payload);
+  return data;
+};
+
 export const fetchApprovalSummary = async () => {
-  const { data } = await axios.get(`${BASE}/summary`, { headers: authHeader() });
-  return data; // { success, data: { total, pending, approved, rejected, revision } }
+  const { data } = await apiClient.get(`${BASE}/summary`);
+  return data;
 };

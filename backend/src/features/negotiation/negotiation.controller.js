@@ -23,7 +23,10 @@ async function getNegotiationHistory(req, res, next) {
     );
     res.json({
       success: true,
-      data: { history },
+      data: {
+        history,
+        negotiations: history,
+      },
     });
   } catch (err) {
     next(err);

@@ -20,8 +20,10 @@ function useNegotiation(quotationId) {
     setError(null);
     try {
       const res = await negotiationApi.getNegotiations(quotationId);
-      setNegotiations(res.data?.data?.negotiations || []);
+      const list = res.data?.data?.negotiations || res.data?.data?.history || res.data?.data || res.data?.history || [];
+      setNegotiations(Array.isArray(list) ? list : []);
     } catch (err) {
+      console.error('Error in fetchNegotiations:', err);
       setError('Unable to load negotiation history.');
     } finally {
       setIsLoading(false);
@@ -39,15 +41,15 @@ function useNegotiation(quotationId) {
       await fetchNegotiations(); // refresh list
       return true;
     } catch (err) {
-      const message = err.response?.data?.message || 'Failed to submit.';
-      alert(message); // simple alert for now
+      const message = err.response?.data?.message || 'Failed to submit negotiation.';
+      alert(message);
       return false;
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return { negotiations, isLoading, error, submitAction, isSubmitting };
+  return { negotiations, isLoading, error, submitAction, isSubmitting, refetch: fetchNegotiations };
 }
 
 export default useNegotiation;

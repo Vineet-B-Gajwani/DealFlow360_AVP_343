@@ -6,7 +6,7 @@ const { DealAlert } = require('./dealAlert.model');
 /**
  * Scan database records for stalled deals (no updates for > thresholdDays).
  */
-async function scanStalledDeals(thresholdDays = 7) {
+async function scanStalledDeals(thresholdDays = 3) {
   const cutoffDate = new Date(Date.now() - thresholdDays * 24 * 60 * 60 * 1000);
   const QuotationModel = mongoose.models.Quotation;
 
@@ -15,7 +15,7 @@ async function scanStalledDeals(thresholdDays = 7) {
   }
 
   const stalledQuotes = await QuotationModel.find({
-    status: { $in: ['DRAFT', 'PENDING_APPROVAL', 'NEGOTIATING'] },
+    status: { $in: ['DRAFT', 'PENDING_APPROVAL', 'SUBMITTED', 'NEGOTIATING', 'REAPPROVAL_REQUIRED'] },
     updatedAt: { $lt: cutoffDate },
   });
 
@@ -68,15 +68,18 @@ async function scanDiscountAnomalies() {
   salesRepStats.forEach((s) => statsMap.set(String(s._id), s.avgDiscount));
 
   const recentQuotes = await QuotationModel.find({
-    createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+    createdAt: { $gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) },
   });
 
   let alertsCreated = 0;
 
   for (const quote of recentQuotes) {
-    const avgForRep = statsMap.get(String(quote.salesRepId)) || 10;
-    // Anomaly if discount exceeds 1.8x the historical average of that sales rep
-    if (quote.discountTotal > avgForRep * 1.8 && quote.discountTotal > 500) {
+    const avgForRep = statsMap.get(String(quote.salesRepId)) || 500;
+    const discountVal = quote.discountTotal || 0;
+    const discountPct = quote.discountPercent || 0;
+
+    // Anomaly if discount percentage exceeds 15% or discount total exceeds 1.5x rep average
+    if ((discountPct > 15 || (discountVal > avgForRep * 1.5 && discountVal > 100))) {
       const existing = await DealAlert.findOne({
         quotationId: quote._id,
         type: 'DISCOUNT_ANOMALY',
@@ -88,7 +91,7 @@ async function scanDiscountAnomalies() {
           quotationId: quote._id,
           type: 'DISCOUNT_ANOMALY',
           severity: 'CRITICAL',
-          reason: `Discount of ₹${quote.discountTotal} on quote ${quote.quotationNumber || quote._id} significantly exceeds sales rep historical mean (₹${Math.round(avgForRep)}).`,
+          reason: `High Discount Warning: Quotation ${quote.quotationNumber || quote._id} has ${discountPct}% discount (₹${discountVal.toLocaleString('en-IN')}), exceeding standard margin limits.`,
         });
         alertsCreated++;
       }

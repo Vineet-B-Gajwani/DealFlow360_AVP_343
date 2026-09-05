@@ -35,7 +35,7 @@ const historyEntrySchema = new mongoose.Schema(
     action: {
       type: String,
       required: true,
-      enum: ['CREATED', 'APPROVED', 'REJECTED', 'REVISION_REQUIRED', 'RESUBMITTED'],
+      enum: ['CREATED', 'APPROVED', 'REJECTED', 'REVISION_REQUIRED', 'RESUBMITTED', 'ESCALATED'],
     },
     /** The user id string who performed this action (matches req.user.id). */
     user: {

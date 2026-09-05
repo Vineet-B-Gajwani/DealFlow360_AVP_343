@@ -82,13 +82,11 @@ function PortalLoginPage() {
       <div className="relative w-full max-w-md">
         {/* Brand header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-600 shadow-lg shadow-brand-900/60 mb-4">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-white" aria-hidden="true">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
-          </div>
+          <img
+            src="/logo.jpg"
+            alt="DealFlow360 Logo"
+            className="w-16 h-16 mx-auto mb-4 rounded-2xl shadow-lg shadow-brand-900/60 object-cover border border-slate-700/50"
+          />
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
             DealFlow<span className="text-brand-400">360</span>
           </h1>
