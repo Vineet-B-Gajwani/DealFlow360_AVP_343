@@ -3,6 +3,9 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from './features/auth/pages/LoginPage';
 import RegisterPage from './features/auth/pages/RegisterPage';
 import ProtectedRoute from './routes/ProtectedRoute';
+import CustomerPortalRoute from './routes/CustomerPortalRoute';
+import PortalLoginPage from './features/customer-portal/pages/PortalLoginPage';
+import PortalDashboardPage from './features/customer-portal/pages/PortalDashboardPage';
 import useAuth from './features/auth/hooks/useAuth';
 import ApprovalListPage from './features/approvals/pages/ApprovalListPage';
 import ApprovalDetailPage from './features/approvals/pages/ApprovalDetailPage';
@@ -58,6 +61,15 @@ function App() {
           <Route path="/dashboard" element={<DashboardPlaceholder />} />
           <Route path="/approvals" element={<ApprovalListPage />} />
           <Route path="/approvals/:id" element={<ApprovalDetailPage />} />
+        </Route>
+
+        {/* ── Customer Portal routes ─────────────────────────────────────── */}
+        {/* Public portal login — separate from internal /login */}
+        <Route path="/portal/login" element={<PortalLoginPage />} />
+
+        {/* Protected portal dashboard — CUSTOMER role only */}
+        <Route element={<CustomerPortalRoute />}>
+          <Route path="/portal" element={<PortalDashboardPage />} />
         </Route>
 
         {/* Example: ADMIN-only protected route */}

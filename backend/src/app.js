@@ -7,6 +7,7 @@ const morgan = require('morgan');
 
 const authRoutes = require('./features/auth/auth.routes');
 const approvalRoutes = require('./features/approvals/approval.routes');
+const customerPortalRoutes = require('./features/customer-portal/customerPortal.routes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -32,6 +33,7 @@ if (process.env.NODE_ENV !== 'test') {
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/approvals', approvalRoutes);
+app.use('/api/portal', customerPortalRoutes);
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) =>
