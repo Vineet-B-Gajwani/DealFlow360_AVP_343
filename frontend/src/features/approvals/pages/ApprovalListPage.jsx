@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useApprovals } from '../hooks/useApprovals';
 import ApprovalTable from '../components/ApprovalTable';
 import NewApprovalForm from '../components/NewApprovalForm';
@@ -25,6 +25,11 @@ export default function ApprovalListPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
 
         {/* ── Page header ── */}
+        <div className="mb-4">
+          <Link to="/approvals/dashboard" className="text-sm text-brand-400 hover:text-brand-300 transition-colors">
+            ← Back to Dashboard
+          </Link>
+        </div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-white">

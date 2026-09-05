@@ -70,3 +70,11 @@ export const returnForRevision = async (id, payload = {}) => {
   });
   return data;
 };
+
+/**
+ * Fetch approval dashboard summary metrics.
+ */
+export const fetchApprovalSummary = async () => {
+  const { data } = await axios.get(`${BASE}/summary`, { headers: authHeader() });
+  return data; // { success, data: { total, pending, approved, rejected, revision } }
+};

@@ -240,6 +240,25 @@ async function getApprovalById(id) {
   return approval;
 }
 
+/**
+ * Get approval dashboard summary metrics.
+ */
+async function getApprovalSummary() {
+  const total = await Approval.countDocuments();
+  const pending = await Approval.countDocuments({ status: APPROVAL_STATUS.PENDING });
+  const approved = await Approval.countDocuments({ status: APPROVAL_STATUS.APPROVED });
+  const rejected = await Approval.countDocuments({ status: APPROVAL_STATUS.REJECTED });
+  const revision = await Approval.countDocuments({ status: APPROVAL_STATUS.REVISION_REQUIRED });
+
+  return {
+    total,
+    pending,
+    approved,
+    rejected,
+    revision,
+  };
+}
+
 module.exports = {
   createApproval,
   approveApproval,
@@ -248,4 +267,5 @@ module.exports = {
   getApprovalHistory,
   listApprovals,
   getApprovalById,
+  getApprovalSummary,
 };

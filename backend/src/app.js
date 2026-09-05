@@ -49,6 +49,10 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/deal-health', dealHealthRoutes);
 app.use('/api/reporting', reportingRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/inventory', require('./features/inventory/inventory.routes'));
+app.use('/api/fulfillment', require('./features/fulfillment/fulfillment.routes'));
+app.use('/api/subscriptions', require('./features/subscriptions/subscriptionPlan.routes'));
+app.use('/api/billing', require('./features/billing/billing.routes'));
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) =>

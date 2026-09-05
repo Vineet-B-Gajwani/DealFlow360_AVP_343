@@ -112,6 +112,18 @@ async function returnForRevision(req, res, next) {
   }
 }
 
+/**
+ * GET /api/approvals/summary
+ */
+async function getApprovalSummary(req, res, next) {
+  try {
+    const summary = await approvalService.getApprovalSummary();
+    res.status(200).json({ success: true, data: summary });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   createApproval,
   listApprovals,
@@ -119,4 +131,5 @@ module.exports = {
   approveApproval,
   rejectApproval,
   returnForRevision,
+  getApprovalSummary,
 };
