@@ -15,6 +15,8 @@ const paymentRoutes = require('./features/payments/payment.routes');
 const dealHealthRoutes = require('./features/deal-health/dealHealth.routes');
 const reportingRoutes = require('./features/reporting/reporting.routes');
 const notificationRoutes = require('./features/notifications/notification.routes');
+const quotationRoutes = require('./features/quotations/quotation.routes');
+const pricingRoutes = require('./features/pricing/pricing.routes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -53,6 +55,8 @@ app.use('/api/inventory', require('./features/inventory/inventory.routes'));
 app.use('/api/fulfillment', require('./features/fulfillment/fulfillment.routes'));
 app.use('/api/subscriptions', require('./features/subscriptions/subscriptionPlan.routes'));
 app.use('/api/billing', require('./features/billing/billing.routes'));
+app.use('/api/quotations', quotationRoutes);
+app.use('/api/pricing', pricingRoutes);
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) =>

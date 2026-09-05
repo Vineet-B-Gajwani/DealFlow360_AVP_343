@@ -66,6 +66,17 @@ const customerSchema = new mongoose.Schema(
     },
 
     /**
+     * Customer Tier (e.g. Standard, Silver, Gold, Platinum).
+     * Used for Discount Rule evaluation and Price Lists.
+     */
+    tier: {
+      type: String,
+      enum: ['Standard', 'Silver', 'Gold', 'Platinum'],
+      default: 'Standard',
+      index: true,
+    },
+
+    /**
      * Timestamp when the customer first activated their portal.
      * Null until the customer completes their first login.
      */

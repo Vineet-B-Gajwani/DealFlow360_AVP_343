@@ -2,11 +2,12 @@
 
 const express = require('express');
 const router = express.Router();
+const preventSelfApproval = require('../../middleware/preventSelfApproval');
 
 const approvalController = require('./approval.controller');
 const { validateCreate, validateAction, validateMongoId } = require('./approval.validation');
 const authenticate = require('../../middleware/authenticate');
-const authorize = require('../../middleware/authorize');
+const roleCheck = require('../../middleware/roleCheck');
 
 /**
  * Role definitions for the approval workflow:
@@ -34,7 +35,7 @@ const REVIEWERS = ['SALES_MANAGER', 'FINANCE_OPERATIONS', 'ADMIN'];
 router.post(
   '/',
   authenticate,
-  authorize(...ALL_INTERNAL),
+  roleCheck(ALL_INTERNAL),
   validateCreate,
   approvalController.createApproval
 );
@@ -43,7 +44,7 @@ router.post(
 router.get(
   '/',
   authenticate,
-  authorize(...ALL_INTERNAL),
+  roleCheck(ALL_INTERNAL),
   approvalController.listApprovals
 );
 
@@ -51,7 +52,7 @@ router.get(
 router.get(
   '/summary',
   authenticate,
-  authorize(...ALL_INTERNAL),
+  roleCheck(ALL_INTERNAL),
   approvalController.getApprovalSummary
 );
 
@@ -59,7 +60,7 @@ router.get(
 router.get(
   '/:id',
   authenticate,
-  authorize(...ALL_INTERNAL),
+  roleCheck(ALL_INTERNAL),
   validateMongoId,
   approvalController.getApprovalById
 );
@@ -68,9 +69,10 @@ router.get(
 router.post(
   '/:id/approve',
   authenticate,
-  authorize(...REVIEWERS),
+  roleCheck(REVIEWERS),
   validateMongoId,
   validateAction,
+  preventSelfApproval,
   approvalController.approveApproval
 );
 
@@ -78,9 +80,10 @@ router.post(
 router.post(
   '/:id/reject',
   authenticate,
-  authorize(...REVIEWERS),
+  roleCheck(REVIEWERS),
   validateMongoId,
   validateAction,
+  preventSelfApproval,
   approvalController.rejectApproval
 );
 
@@ -88,9 +91,10 @@ router.post(
 router.post(
   '/:id/revision',
   authenticate,
-  authorize(...REVIEWERS),
+  roleCheck(REVIEWERS),
   validateMongoId,
   validateAction,
+  preventSelfApproval,
   approvalController.returnForRevision
 );
 

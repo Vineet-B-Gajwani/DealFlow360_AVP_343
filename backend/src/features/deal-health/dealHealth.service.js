@@ -15,7 +15,7 @@ async function scanStalledDeals(thresholdDays = 7) {
   }
 
   const stalledQuotes = await QuotationModel.find({
-    status: { $in: ['DRAFT', 'PENDING_APPROVAL', 'UNDER_NEGOTIATION'] },
+    status: { $in: ['DRAFT', 'PENDING_APPROVAL', 'NEGOTIATING'] },
     updatedAt: { $lt: cutoffDate },
   });
 

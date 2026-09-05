@@ -21,6 +21,21 @@ function ReportingDashboardPage() {
     fetchReport();
   }, []);
 
+  const handleExport = async (type) => {
+    try {
+      const res = await reportingApi.exportReport();
+      const blob = new Blob([res.data], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dealflow360_report_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Failed to export report: ' + (err.message || err));
+    }
+  };
+
   if (isLoading) {
     return <div className="min-h-screen bg-slate-950 text-white p-6 text-center py-20">Loading analytics data...</div>;
   }
@@ -34,9 +49,19 @@ function ReportingDashboardPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold">Executive Analytics & Reporting</h1>
-          <p className="text-slate-400 text-sm mt-1">Real-time MongoDB aggregation metrics for pipeline, billing, and payments.</p>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-2xl font-bold">Executive Analytics & Reporting</h1>
+            <p className="text-slate-400 text-sm mt-1">Real-time MongoDB aggregation metrics for pipeline, billing, and payments.</p>
+          </div>
+          <div className="flex gap-3">
+            <button onClick={() => handleExport('PDF')} className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded text-sm font-medium border border-slate-700">
+              Export PDF
+            </button>
+            <button onClick={() => handleExport('XLS')} className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded text-sm font-medium border border-slate-700">
+              Export Excel
+            </button>
+          </div>
         </div>
 
         {/* Overview Stat Cards */}

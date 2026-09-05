@@ -1,5 +1,6 @@
 'use strict';
 
+const mongoose = require('mongoose');
 const { Approval, APPROVAL_STATUS, REQUIRED_LEVEL } = require('./approval.model');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -159,6 +160,15 @@ async function approveApproval(id, actingUser, reason = '') {
   }
 
   await approval.save();
+
+  // ── Sync Quotation status when fully approved ──────────────────────────
+  if (approval.status === APPROVAL_STATUS.APPROVED) {
+    const QuotationModel = mongoose.models.Quotation;
+    if (QuotationModel) {
+      await QuotationModel.findByIdAndUpdate(approval.quotationId, { status: 'APPROVED' });
+    }
+  }
+
   return approval;
 }
 
@@ -182,6 +192,13 @@ async function rejectApproval(id, actingUser, reason = '') {
   approval.history.push(historyEntry('REJECTED', actingUser, reason));
 
   await approval.save();
+
+  // ── Sync Quotation status on rejection ──────────────────────────────────
+  const QuotationModelR = mongoose.models.Quotation;
+  if (QuotationModelR) {
+    await QuotationModelR.findByIdAndUpdate(approval.quotationId, { status: 'REJECTED' });
+  }
+
   return approval;
 }
 
@@ -206,6 +223,13 @@ async function returnForRevision(id, actingUser, reason = '') {
   approval.history.push(historyEntry('REVISION_REQUIRED', actingUser, reason));
 
   await approval.save();
+
+  // ── Sync Quotation status on revision request ──────────────────────────
+  const QuotationModelRev = mongoose.models.Quotation;
+  if (QuotationModelRev) {
+    await QuotationModelRev.findByIdAndUpdate(approval.quotationId, { status: 'DRAFT' });
+  }
+
   return approval;
 }
 

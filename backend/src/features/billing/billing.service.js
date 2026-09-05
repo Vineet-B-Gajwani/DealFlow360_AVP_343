@@ -118,14 +118,93 @@ async function cancelSubscription(id, cancelDateStr) {
 }
 
 /**
- * List active subscriptions
+ * List subscriptions based on query filters.
+ * Supports optional pagination via limit and skip.
  */
 async function listSubscriptions(query = {}) {
-  return await Subscription.find(query).sort({ createdAt: -1 });
+  const { limit, skip, ...filters } = query;
+  const cursor = Subscription.find(filters);
+  if (skip) cursor.skip(parseInt(skip, 10));
+  if (limit) cursor.limit(parseInt(limit, 10));
+  return await cursor.exec();
+}
+
+
+/**
+ * Update a subscription (upgrade/downgrade) and calculate prorated credit/charge
+ */
+async function updateSubscription(id, updateData, changeDateStr) {
+  const subscription = await Subscription.findById(id).populate('subscriptionPlanId');
+  if (!subscription) throw makeError('Subscription not found', 404);
+  if (subscription.status === 'CANCELLED') throw makeError('Cannot update cancelled subscription', 400);
+
+  const plan = subscription.subscriptionPlanId;
+  const changeDate = new Date(changeDateStr || Date.now());
+  const nextBilling = new Date(subscription.nextBillingDate);
+  
+  let prorationCredit = 0;
+  let newAmount = subscription.amount; // defaults to old amount
+
+  if (updateData.quantity) {
+    newAmount = plan.price * updateData.quantity;
+  }
+
+  // Calculate proration for the remaining days of the current cycle
+  if (plan.prorationConfiguration?.enabled && changeDate < nextBilling) {
+    let cycleStart;
+    if (subscription.frequency === 'MONTHLY') cycleStart = addMonths(nextBilling, -1);
+    else if (subscription.frequency === 'QUARTERLY') cycleStart = addMonths(nextBilling, -3);
+    else if (subscription.frequency === 'YEARLY') cycleStart = addMonths(nextBilling, -12);
+
+    const totalCycleMs = nextBilling.getTime() - cycleStart.getTime();
+    const unusedMs = nextBilling.getTime() - changeDate.getTime();
+    
+    if (unusedMs > 0 && totalCycleMs > 0) {
+      const unusedRatio = unusedMs / totalCycleMs;
+      const oldRemainingValue = subscription.amount * unusedRatio;
+      const newRemainingValue = newAmount * unusedRatio;
+      
+      // If negative, it's a credit to the customer. If positive, they owe more.
+      prorationCredit = parseFloat((oldRemainingValue - newRemainingValue).toFixed(2));
+    }
+  }
+
+  // Update subscription fields
+  if (updateData.quantity) subscription.quantity = updateData.quantity;
+  subscription.amount = newAmount;
+
+  // Re-write pending bills
+  subscription.billingSchedule = subscription.billingSchedule.map(bill => {
+    if (bill.status === 'PENDING' && new Date(bill.date) >= changeDate) {
+      return { ...bill.toObject(), amount: newAmount };
+    }
+    return bill;
+  });
+
+  // Inject a one-time proration adjustment record if applicable
+  if (prorationCredit !== 0) {
+    subscription.billingSchedule.push({
+      date: changeDate,
+      amount: -prorationCredit, // Negative means charge, positive means credit
+      status: 'PENDING',
+      isProrated: true,
+    });
+  }
+
+  await subscription.save();
+
+  return {
+    subscription,
+    proration: {
+      creditAmount: prorationCredit,
+      currency: 'USD',
+    }
+  };
 }
 
 module.exports = {
   createSubscription,
   cancelSubscription,
   listSubscriptions,
+  updateSubscription,
 };

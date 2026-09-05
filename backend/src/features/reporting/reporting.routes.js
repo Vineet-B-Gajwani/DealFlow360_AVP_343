@@ -11,5 +11,6 @@ router.use(authenticate);
 router.use(authorize('ADMIN', 'SALES_MANAGER'));
 
 router.get('/summary', controller.getSummaryReport);
+router.get('/export', controller.exportReport);
 
 module.exports = router;

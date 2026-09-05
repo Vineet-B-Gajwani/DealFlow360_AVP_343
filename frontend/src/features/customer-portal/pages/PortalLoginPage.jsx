@@ -170,8 +170,27 @@ function PortalLoginPage() {
             </button>
           </form>
 
+          {/* Quick Customer Demo Login */}
+          <div className="mt-6 pt-4 border-t border-slate-800">
+            <button
+              type="button"
+              onClick={() => {
+                setValue('email', 'customer@acme.local');
+                setValue('password', 'password123');
+                onSubmit({ email: 'customer@acme.local', password: 'password123' });
+              }}
+              className="w-full p-2.5 bg-brand-950/60 hover:bg-brand-900/60 border border-brand-800/50 text-brand-300 rounded text-xs flex justify-between items-center"
+            >
+              <div className="text-left">
+                <span className="font-bold text-white block">⚡ Quick Demo Customer Login</span>
+                <span>customer@acme.local (Acme Corp)</span>
+              </div>
+              <span className="text-[10px] bg-brand-700 text-white px-2 py-1 rounded">Sign In</span>
+            </button>
+          </div>
+
           {/* Internal link */}
-          <p className="text-center text-xs text-slate-600 mt-6">
+          <p className="text-center text-xs text-slate-600 mt-4">
             Internal DealFlow360 user?{' '}
             <Link to="/login" className="link text-xs">
               Use the staff login

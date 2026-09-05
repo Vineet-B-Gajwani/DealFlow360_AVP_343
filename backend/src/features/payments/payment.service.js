@@ -1,6 +1,7 @@
 'use strict';
 
 const { Payment } = require('./payment.model');
+const notificationService = require('../notifications/notification.service');
 const { Invoice } = require('../invoices/invoice.model');
 
 /**
@@ -29,6 +30,15 @@ async function recordPayment({ invoiceId, amount, method = 'BANK', reference = n
 
   // Update invoice payment status
   if (totalPaid >= invoice.total) {
+    // Emit payment notification
+    await notificationService.createNotification({
+      userId: null,
+      recipientRole: 'FINANCE_OPERATIONS',
+      type: 'INVOICE_PAYMENT',
+      title: `Invoice ${invoice.invoiceNumber} fully paid`,
+      message: `Payment of ₹${totalPaid} received. Invoice is now PAID.`,
+      link: `/invoices/${invoice._id}`
+    });
     invoice.paymentStatus = 'PAID';
     invoice.status = 'PAID';
   } else if (totalPaid > 0) {
