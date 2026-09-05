@@ -34,6 +34,10 @@ if (process.env.NODE_ENV !== 'test') {
 app.use('/api/auth', authRoutes);
 app.use('/api/approvals', approvalRoutes);
 app.use('/api/portal', customerPortalRoutes);
+app.use('/api/inventory', require('./features/inventory/inventory.routes'));
+app.use('/api/fulfillment', require('./features/fulfillment/fulfillment.routes'));
+app.use('/api/subscriptions', require('./features/subscriptions/subscriptionPlan.routes'));
+app.use('/api/billing', require('./features/billing/billing.routes'));
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) =>

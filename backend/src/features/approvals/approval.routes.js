@@ -47,6 +47,14 @@ router.get(
   approvalController.listApprovals
 );
 
+// GET /api/approvals/summary
+router.get(
+  '/summary',
+  authenticate,
+  authorize(...ALL_INTERNAL),
+  approvalController.getApprovalSummary
+);
+
 // GET /api/approvals/:id
 router.get(
   '/:id',
