@@ -5,6 +5,7 @@ import QuotationStatusBadge from '../components/QuotationStatusBadge';
 import QuotationLineTable from '../components/QuotationLineTable';
 import QuotationTotals from '../components/QuotationTotals';
 import useQuotation from '../hooks/useQuotation';
+import NegotiationPanel from '../../negotiation/components/NegotiationPanel';
 
 /**
  * QuotationDetailPage
@@ -120,23 +121,9 @@ function QuotationDetailPage() {
                 </div>
               </div>
 
-              {/* Negotiation placeholder — intentionally not implemented */}
-              <div className="portal-card bg-slate-900/40 border-dashed" id="negotiation-placeholder">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center flex-shrink-0" aria-hidden="true">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-400">
-                      Negotiation &amp; Comments
-                    </p>
-                    <p className="text-xs text-slate-600">
-                      Available in a future release
-                    </p>
-                  </div>
-                </div>
+              {/* Negotiation Panel */}
+              <div id="negotiation-panel">
+                <NegotiationPanel quotationId={id} />
               </div>
 
             </div>
@@ -148,3 +135,4 @@ function QuotationDetailPage() {
 }
 
 export default QuotationDetailPage;
+

@@ -7,6 +7,9 @@ import CustomerPortalRoute from './routes/CustomerPortalRoute';
 import PortalLoginPage from './features/customer-portal/pages/PortalLoginPage';
 import PortalDashboardPage from './features/customer-portal/pages/PortalDashboardPage';
 import QuotationDetailPage from './features/customer-portal/pages/QuotationDetailPage';
+import InvoiceListPage from './features/invoices/pages/InvoiceListPage';
+import InvoiceDetailPage from './features/invoices/pages/InvoiceDetailPage';
+import ReportingDashboard from './features/reporting/pages/ReportingDashboard';
 import useAuth from './features/auth/hooks/useAuth';
 
 // ── Temporary placeholder dashboard — replace in a future feature ─────────────
@@ -68,6 +71,9 @@ function App() {
         <Route element={<CustomerPortalRoute />}>
           <Route path="/portal" element={<PortalDashboardPage />} />
           <Route path="/portal/quotations/:id" element={<QuotationDetailPage />} />
+          <Route path="/portal/invoices" element={<InvoiceListPage />} />
+          <Route path="/portal/invoices/:id" element={<InvoiceDetailPage />} />
+          <Route path="/portal/reporting" element={<ReportingDashboard />} />
         </Route>
 
         {/* Example: ADMIN-only protected route */}

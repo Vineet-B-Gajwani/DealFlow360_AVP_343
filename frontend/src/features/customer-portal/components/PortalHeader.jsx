@@ -1,5 +1,7 @@
 import React from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../auth/hooks/useAuth';
+import NotificationDropdown from '../../notifications/components/NotificationDropdown';
 
 /**
  * PortalHeader
@@ -32,8 +34,9 @@ function PortalHeader() {
           </div>
         </div>
 
-        {/* User info + logout */}
+        {/* User info + notifications + logout */}
         <div className="flex items-center gap-4">
+          <NotificationDropdown />
           <div className="hidden sm:block text-right">
             <p className="text-sm font-semibold text-slate-100 leading-none">{user?.name}</p>
             <p className="text-xs text-slate-400 mt-0.5">{user?.email}</p>
