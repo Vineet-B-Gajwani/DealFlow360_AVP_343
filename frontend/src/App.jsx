@@ -6,6 +6,9 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import CustomerPortalRoute from './routes/CustomerPortalRoute';
 import PortalLoginPage from './features/customer-portal/pages/PortalLoginPage';
 import PortalDashboardPage from './features/customer-portal/pages/PortalDashboardPage';
+import ProductListPage from './features/products/pages/ProductListPage';
+import ProductCreatePage from './features/products/pages/ProductCreatePage';
+import ProductEditPage from './features/products/pages/ProductEditPage';
 import useAuth from './features/auth/hooks/useAuth';
 
 // ── Temporary placeholder dashboard — replace in a future feature ─────────────
@@ -57,6 +60,13 @@ function App() {
         {/* Authenticated routes (any role) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPlaceholder />} />
+          <Route path="/products" element={<ProductListPage />} />
+        </Route>
+
+        {/* Product Management (ADMIN & SALES_MANAGER write access) */}
+        <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'SALES_MANAGER']} />}>
+          <Route path="/products/new" element={<ProductCreatePage />} />
+          <Route path="/products/:id/edit" element={<ProductEditPage />} />
         </Route>
 
         {/* ── Customer Portal routes ─────────────────────────────────────── */}

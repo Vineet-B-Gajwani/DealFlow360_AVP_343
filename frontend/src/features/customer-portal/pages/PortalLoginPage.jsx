@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { z } from 'zod';
 import useAuth from '../../auth/hooks/useAuth';
 
@@ -32,6 +32,7 @@ const portalLoginSchema = z.object({
 function PortalLoginPage() {
   const { login, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [serverError, setServerError] = useState('');
 
   const {
@@ -59,7 +60,9 @@ function PortalLoginPage() {
         return;
       }
 
-      navigate('/portal', { replace: true });
+      // Redirect back to the originally requested portal page, or /portal
+      const from = location.state?.from?.pathname || '/portal';
+      navigate(from, { replace: true });
     } catch (err) {
       const message =
         err?.response?.data?.message || 'Login failed. Please try again.';
