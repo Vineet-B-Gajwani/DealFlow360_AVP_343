@@ -6,6 +6,7 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import CustomerPortalRoute from './routes/CustomerPortalRoute';
 import PortalLoginPage from './features/customer-portal/pages/PortalLoginPage';
 import PortalDashboardPage from './features/customer-portal/pages/PortalDashboardPage';
+import QuotationDetailPage from './features/customer-portal/pages/QuotationDetailPage';
 import useAuth from './features/auth/hooks/useAuth';
 
 // ── Temporary placeholder dashboard — replace in a future feature ─────────────
@@ -66,6 +67,7 @@ function App() {
         {/* Protected portal dashboard — CUSTOMER role only */}
         <Route element={<CustomerPortalRoute />}>
           <Route path="/portal" element={<PortalDashboardPage />} />
+          <Route path="/portal/quotations/:id" element={<QuotationDetailPage />} />
         </Route>
 
         {/* Example: ADMIN-only protected route */}

@@ -38,4 +38,29 @@ router.get('/me', authenticate, requireCustomer, controller.getMyProfile);
  */
 router.get('/status', authenticate, requireCustomer, controller.getPortalStatus);
 
+// ── Quotation routes ──────────────────────────────────────────────────────────
+
+/**
+ * GET /api/portal/quotations
+ *
+ * Returns all quotations belonging to the authenticated customer.
+ * customerId is resolved from req.user.id (JWT) — never from query params.
+ *
+ * INTEGRATION POINT: Proxies to GET /api/quotations?customerId=<id>
+ * Requires Member 1's quotation endpoint to be available.
+ */
+router.get('/quotations', authenticate, requireCustomer, controller.getMyQuotations);
+
+/**
+ * GET /api/portal/quotations/:id
+ *
+ * Returns a single quotation. Enforces ownership:
+ *   quotation.customerId must match the authenticated customer's ID.
+ * Returns 403 if the customer does not own the quotation.
+ *
+ * INTEGRATION POINT: Proxies to GET /api/quotations/:id
+ */
+router.get('/quotations/:id', authenticate, requireCustomer, controller.getQuotation);
+
 module.exports = router;
+

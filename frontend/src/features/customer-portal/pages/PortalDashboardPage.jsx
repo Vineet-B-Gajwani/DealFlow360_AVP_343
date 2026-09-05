@@ -2,7 +2,7 @@ import React from 'react';
 import PortalHeader from '../components/PortalHeader';
 import CustomerIdentityCard from '../components/CustomerIdentityCard';
 import PortalStatusCard from '../components/PortalStatusCard';
-import QuotationsPlaceholder from '../components/QuotationsPlaceholder';
+import QuotationsList from '../components/QuotationsList';
 import useCustomerPortal from '../hooks/useCustomerPortal';
 
 /**
@@ -75,7 +75,7 @@ function PortalDashboardPage() {
 
               {/* Right column: Quotations */}
               <div className="portal-content-area">
-                <QuotationsPlaceholder />
+                <QuotationsList />
               </div>
             </div>
           )}

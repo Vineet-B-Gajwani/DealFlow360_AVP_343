@@ -49,4 +49,39 @@ async function getPortalStatus(req, res, next) {
   }
 }
 
-module.exports = { getMyProfile, getPortalStatus };
+/**
+ * GET /api/portal/quotations
+ *
+ * Returns all quotations belonging to the authenticated customer.
+ * Ownership is resolved server-side from req.user.id — not from any query param.
+ */
+async function getMyQuotations(req, res, next) {
+  try {
+    const result = await portalService.getMyQuotations(req.user.id);
+    res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * GET /api/portal/quotations/:id
+ *
+ * Returns a single quotation if it belongs to the authenticated customer.
+ * Ownership check (customerId === customer identity) is enforced in the service.
+ * Returns 403 if the quotation belongs to a different customer.
+ */
+async function getQuotation(req, res, next) {
+  try {
+    const quotation = await portalService.getQuotationById(
+      req.user.id,
+      req.params.id
+    );
+    res.json({ success: true, data: { quotation } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getMyProfile, getPortalStatus, getMyQuotations, getQuotation };
+
