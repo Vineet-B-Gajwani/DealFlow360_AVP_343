@@ -75,4 +75,160 @@
     @apply text-brand-400 hover:text-brand-300 transition-colors duration-150
            font-medium underline-offset-2 hover:underline;
   }
+
+  /* ── Customer Portal — Layout ───────────────────────────────────────────── */
+
+  /* Full-page portal shell */
+  .portal-layout {
+    @apply min-h-screen bg-slate-950 flex flex-col;
+  }
+
+  /* Top navigation bar */
+  .portal-header {
+    @apply sticky top-0 z-50
+           bg-slate-900/80 backdrop-blur-md
+           border-b border-slate-700/50
+           shadow-lg shadow-black/30;
+  }
+
+  .portal-header-inner {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 h-16
+           flex items-center justify-between;
+  }
+
+  /* Brand mark inside the header */
+  .portal-brand-icon {
+    @apply flex items-center justify-center w-9 h-9
+           rounded-xl bg-brand-600
+           text-white shadow-md shadow-brand-900/50;
+  }
+
+  .portal-brand-name {
+    @apply block text-sm font-bold text-white leading-none;
+  }
+
+  .portal-brand-label {
+    @apply block text-xs text-brand-400 leading-none mt-0.5;
+  }
+
+  /* Sign-out button */
+  .portal-logout-btn {
+    @apply flex items-center px-3 py-1.5 rounded-lg text-sm font-medium
+           text-slate-400 hover:text-white
+           bg-slate-800/50 hover:bg-slate-700/70
+           border border-slate-700/50 hover:border-slate-600
+           transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-brand-500;
+  }
+
+  /* Main content area */
+  .portal-main {
+    @apply flex-1 py-8;
+  }
+
+  .portal-container {
+    @apply max-w-6xl mx-auto px-4 sm:px-6;
+  }
+
+  /* Dashboard grid: sidebar + main content */
+  .portal-grid {
+    @apply grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6;
+  }
+
+  .portal-sidebar {
+    @apply flex flex-col gap-6;
+  }
+
+  .portal-content-area {
+    @apply flex flex-col gap-6;
+  }
+
+  /* Generic card base */
+  .portal-card {
+    @apply bg-slate-900/70 backdrop-blur-sm
+           border border-slate-700/50
+           rounded-2xl shadow-xl shadow-black/20
+           p-6;
+  }
+
+  /* Identity card */
+  .portal-identity-card {
+    @apply portal-card;
+  }
+
+  /* Circular avatar with initials */
+  .portal-avatar {
+    @apply flex-shrink-0 flex items-center justify-center
+           w-14 h-14 rounded-2xl
+           bg-brand-600/20 border border-brand-500/30
+           text-brand-400 text-2xl font-bold;
+  }
+
+  /* CUSTOMER role badge */
+  .portal-role-badge {
+    @apply inline-block mt-1 px-2 py-0.5 rounded-md
+           text-xs font-semibold uppercase tracking-wider
+           bg-brand-900/60 text-brand-300
+           border border-brand-700/40;
+  }
+
+  /* Row of identity fields */
+  .portal-identity-field {
+    @apply flex items-start gap-3 py-2
+           border-b border-slate-800/60 last:border-0;
+  }
+
+  .portal-identity-field-icon {
+    @apply flex-shrink-0 mt-0.5 text-slate-500;
+  }
+
+  /* Status card */
+  .portal-status-card {
+    @apply portal-card;
+  }
+
+  /* "Active" badge in status card */
+  .portal-active-badge {
+    @apply flex items-center gap-1.5 px-2.5 py-1 rounded-full
+           text-xs font-semibold
+           bg-emerald-900/40 text-emerald-400
+           border border-emerald-700/40;
+  }
+
+  .portal-active-dot {
+    @apply w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse;
+  }
+
+  /* Individual stat block inside status card */
+  .portal-stat {
+    @apply flex items-center gap-3 p-3
+           bg-slate-800/50 rounded-xl
+           border border-slate-700/40;
+  }
+
+  .portal-stat-icon {
+    @apply flex-shrink-0 text-brand-400;
+  }
+
+  /* Empty / placeholder state (quotations section) */
+  .portal-empty-state {
+    @apply flex flex-col items-center justify-center
+           py-16 text-center;
+  }
+
+  .portal-empty-icon {
+    @apply flex items-center justify-center w-16 h-16 rounded-2xl
+           bg-slate-800/60 text-slate-500 mb-4
+           border border-slate-700/40;
+  }
+
+  /* Loading state */
+  .portal-loading {
+    @apply flex flex-col items-center justify-center py-24;
+  }
+
+  /* Error state */
+  .portal-error-state {
+    @apply flex flex-col items-center justify-center py-24 text-center;
+  }
 }

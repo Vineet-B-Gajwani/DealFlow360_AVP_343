@@ -3,6 +3,9 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from './features/auth/pages/LoginPage';
 import RegisterPage from './features/auth/pages/RegisterPage';
 import ProtectedRoute from './routes/ProtectedRoute';
+import CustomerPortalRoute from './routes/CustomerPortalRoute';
+import PortalLoginPage from './features/customer-portal/pages/PortalLoginPage';
+import PortalDashboardPage from './features/customer-portal/pages/PortalDashboardPage';
 import useAuth from './features/auth/hooks/useAuth';
 
 // ── Temporary placeholder dashboard — replace in a future feature ─────────────
@@ -54,6 +57,15 @@ function App() {
         {/* Authenticated routes (any role) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPlaceholder />} />
+        </Route>
+
+        {/* ── Customer Portal routes ─────────────────────────────────────── */}
+        {/* Public portal login — separate from internal /login */}
+        <Route path="/portal/login" element={<PortalLoginPage />} />
+
+        {/* Protected portal dashboard — CUSTOMER role only */}
+        <Route element={<CustomerPortalRoute />}>
+          <Route path="/portal" element={<PortalDashboardPage />} />
         </Route>
 
         {/* Example: ADMIN-only protected route */}
