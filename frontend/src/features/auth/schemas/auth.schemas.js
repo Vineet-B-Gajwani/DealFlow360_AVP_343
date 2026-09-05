@@ -1,5 +1,13 @@
 import { z } from 'zod';
 
+export const ALL_ROLES = [
+  'SALES_REP',
+  'SALES_MANAGER',
+  'FINANCE_OPERATIONS',
+  'ADMIN',
+  'CUSTOMER',
+];
+
 export const INTERNAL_ROLES = [
   'SALES_REP',
   'SALES_MANAGER',
@@ -7,7 +15,7 @@ export const INTERNAL_ROLES = [
   'ADMIN',
 ];
 
-// ── Login ─────────────────────────────────────────────────────────────────────
+// ── Login Schema with RBAC Role ────────────────────────────────────────────────
 
 export const loginSchema = z.object({
   email: z
@@ -15,9 +23,12 @@ export const loginSchema = z.object({
     .min(1, 'Email is required')
     .email('Must be a valid email address'),
   password: z.string().min(1, 'Password is required'),
+  role: z
+    .string()
+    .min(1, 'Please select your role'),
 });
 
-// ── Register ──────────────────────────────────────────────────────────────────
+// ── Registration Schema ────────────────────────────────────────────────────────
 
 export const registerSchema = z
   .object({
@@ -35,9 +46,21 @@ export const registerSchema = z
       .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
       .regex(/[0-9]/, 'Password must contain at least one number'),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
-    role: z.enum(INTERNAL_ROLES, {
+    role: z.enum(ALL_ROLES, {
       errorMap: () => ({ message: 'Please select a valid role' }),
     }),
+
+    // Customer profile fields (optional unless role === 'CUSTOMER')
+    companyName: z.string().optional(),
+    phone: z.string().optional(),
+    address: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    zipCode: z.string().optional(),
+    country: z.string().optional(),
+    taxId: z.string().optional(),
+    proofDocId: z.string().optional(),
+    tier: z.enum(['Standard', 'Silver', 'Gold', 'Platinum']).optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',

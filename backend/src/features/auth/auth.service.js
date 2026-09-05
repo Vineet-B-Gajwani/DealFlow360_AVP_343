@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { User } = require('./auth.model');
+const { Customer } = require('../customer-portal/customer.model');
 
 const SALT_ROUNDS = 12;
 
@@ -31,10 +31,25 @@ function generateRefreshToken(user) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Register a new internal user.
+ * Register a new user (Internal staff or Customer).
  * Returns the created user (without passwordHash) plus token pair.
  */
-async function register({ name, email, password, role }) {
+async function register({
+  name,
+  email,
+  password,
+  role = 'CUSTOMER',
+  companyName,
+  phone,
+  address,
+  city,
+  state,
+  zipCode,
+  country,
+  tier = 'Standard',
+  taxId,
+  proofDocId,
+}) {
   // Check for existing email
   const existing = await User.findOne({ email });
   if (existing) {
@@ -46,8 +61,26 @@ async function register({ name, email, password, role }) {
   // Hash password
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
-  // Create user
+  // Create user identity
   const user = await User.create({ name, email, passwordHash, role });
+
+  // If registering as a CUSTOMER, create customer business profile record
+  if (role === 'CUSTOMER') {
+    await Customer.create({
+      userId: user._id,
+      companyName: companyName || name,
+      phone: phone || null,
+      address: address || null,
+      city: city || null,
+      state: state || null,
+      zipCode: zipCode || null,
+      country: country || null,
+      tier: tier || 'Standard',
+      taxId: taxId || null,
+      proofDocId: proofDocId || null,
+      portalActivatedAt: new Date(),
+    });
+  }
 
   // Generate tokens
   const accessToken = generateAccessToken(user);
@@ -65,10 +98,10 @@ async function register({ name, email, password, role }) {
 }
 
 /**
- * Login with email and password.
+ * Login with email, password, and RBAC role validation.
  * Returns the user (without passwordHash) plus token pair.
  */
-async function login({ email, password }) {
+async function login({ email, password, role }) {
   // Explicitly select passwordHash (excluded by default)
   const user = await User.findOne({ email }).select('+passwordHash +refreshToken');
 
@@ -81,6 +114,13 @@ async function login({ email, password }) {
   if (!user.isActive) {
     const err = new Error('Account is deactivated. Contact an administrator.');
     err.statusCode = 403;
+    throw err;
+  }
+
+  // RBAC Role check — if a role was selected, verify it matches the user's account role
+  if (role && user.role !== role) {
+    const err = new Error(`Role mismatch: Your account has role '${user.role}', but '${role}' was selected in the form.`);
+    err.statusCode = 401;
     throw err;
   }
 

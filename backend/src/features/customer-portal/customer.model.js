@@ -66,6 +66,48 @@ const customerSchema = new mongoose.Schema(
     },
 
     /**
+     * City, State, Zip, Country details.
+     */
+    city: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    state: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    zipCode: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    country: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+
+    /**
+     * Tax ID / Business Registration Number (e.g. GSTIN, EIN).
+     */
+    taxId: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+
+    /**
+     * Business Identity / Proof Document ID.
+     */
+    proofDocId: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+
+    /**
      * Customer Tier (e.g. Standard, Silver, Gold, Platinum).
      * Used for Discount Rule evaluation and Price Lists.
      */

@@ -24,21 +24,13 @@ const registerRules = [
     .notEmpty()
     .withMessage('Password is required')
     .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters')
-    .matches(/[A-Z]/)
-    .withMessage('Password must contain at least one uppercase letter')
-    .matches(/[a-z]/)
-    .withMessage('Password must contain at least one lowercase letter')
-    .matches(/[0-9]/)
-    .withMessage('Password must contain at least one digit')
-    .matches(/[^A-Za-z0-9]/)
-    .withMessage('Password must contain at least one special character'),
+    .withMessage('Password must be at least 8 characters'),
 
   body('role')
     .notEmpty()
     .withMessage('Role is required')
-    .isIn(['SALES_REP', 'SALES_MANAGER', 'FINANCE_OPERATIONS', 'ADMIN'])
-    .withMessage('Role must be one of: SALES_REP, SALES_MANAGER, FINANCE_OPERATIONS, ADMIN')
+    .isIn(['SALES_REP', 'SALES_MANAGER', 'FINANCE_OPERATIONS', 'ADMIN', 'CUSTOMER'])
+    .withMessage('Role must be one of: SALES_REP, SALES_MANAGER, FINANCE_OPERATIONS, ADMIN, CUSTOMER'),
 ];
 
 const loginRules = [
@@ -52,7 +44,12 @@ const loginRules = [
   body('password')
     .trim()
     .notEmpty()
-    .withMessage('Password is required')
+    .withMessage('Password is required'),
+
+  body('role')
+    .optional()
+    .isIn(['SALES_REP', 'SALES_MANAGER', 'FINANCE_OPERATIONS', 'ADMIN', 'CUSTOMER'])
+    .withMessage('Role must be one of: SALES_REP, SALES_MANAGER, FINANCE_OPERATIONS, ADMIN, CUSTOMER'),
 ];
 
 function validate(req, res, next) {
@@ -60,7 +57,7 @@ function validate(req, res, next) {
   if (!errors.isEmpty()) {
     const error = new Error('Validation failed');
     error.statusCode = 422;
-    error.errors = errors.array().map(e => ({
+    error.errors = errors.array().map((e) => ({
       field: e.path,
       message: e.msg,
     }));
