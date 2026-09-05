@@ -15,6 +15,7 @@ import ReportingDashboardPage from './features/reporting/pages/ReportingDashboar
 import useAuth from './features/auth/hooks/useAuth';
 import ApprovalListPage from './features/approvals/pages/ApprovalListPage';
 import ApprovalDetailPage from './features/approvals/pages/ApprovalDetailPage';
+import QuotationDetailPage from './features/customer-portal/pages/QuotationDetailPage';
 
 // ── Temporary placeholder dashboard — replace in a future feature ─────────────
 function DashboardPlaceholder() {
@@ -86,62 +87,63 @@ function App() {
         {/* Protected portal dashboard — CUSTOMER role only */}
         <Route element={<CustomerPortalRoute />}>
           <Route path="/portal" element={<PortalDashboardPage />} />
+          <Route path="/portal/quotations/:id" element={<QuotationDetailPage />} />
         </Route>
 
-        {/* Example: ADMIN-only protected route */}
-        <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-          <Route
-            path="/admin"
-            element={
-              <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-                <div className="auth-card text-center max-w-sm">
-                  <div className="text-5xl mb-4">🛡️</div>
-                  <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
-                  <p className="text-slate-400 text-sm mt-2">
-                    This page is restricted to the ADMIN role.
-                  </p>
-                </div>
-              </main>
-            }
-          />
-        </Route>
+  {/* Example: ADMIN-only protected route */ }
+  <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+    <Route
+      path="/admin"
+      element={
+        <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+          <div className="auth-card text-center max-w-sm">
+            <div className="text-5xl mb-4">🛡️</div>
+            <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
+            <p className="text-slate-400 text-sm mt-2">
+              This page is restricted to the ADMIN role.
+            </p>
+          </div>
+        </main>
+      }
+    />
+  </Route>
 
-        {/* Example: SALES_MANAGER + ADMIN protected route */}
-        <Route element={<ProtectedRoute allowedRoles={['SALES_MANAGER', 'ADMIN']} />}>
-          <Route
-            path="/sales-management"
-            element={
-              <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-                <div className="auth-card text-center max-w-sm">
-                  <div className="text-5xl mb-4">📊</div>
-                  <h1 className="text-2xl font-bold text-white">Sales Management</h1>
-                  <p className="text-slate-400 text-sm mt-2">
-                    Restricted to SALES_MANAGER and ADMIN.
-                  </p>
-                </div>
-              </main>
-            }
-          />
-        </Route>
+  {/* Example: SALES_MANAGER + ADMIN protected route */ }
+  <Route element={<ProtectedRoute allowedRoles={['SALES_MANAGER', 'ADMIN']} />}>
+    <Route
+      path="/sales-management"
+      element={
+        <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+          <div className="auth-card text-center max-w-sm">
+            <div className="text-5xl mb-4">📊</div>
+            <h1 className="text-2xl font-bold text-white">Sales Management</h1>
+            <p className="text-slate-400 text-sm mt-2">
+              Restricted to SALES_MANAGER and ADMIN.
+            </p>
+          </div>
+        </main>
+      }
+    />
+  </Route>
 
-        {/* Default: redirect root to /dashboard */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+  {/* Default: redirect root to /dashboard */ }
+  <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        {/* 404 */}
-        <Route
-          path="*"
-          element={
-            <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-              <div className="auth-card text-center max-w-sm">
-                <div className="text-6xl mb-4">🔍</div>
-                <h1 className="text-2xl font-bold text-white">404</h1>
-                <p className="text-slate-400 text-sm mt-2">Page not found</p>
-              </div>
-            </main>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+  {/* 404 */ }
+  <Route
+    path="*"
+    element={
+      <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="auth-card text-center max-w-sm">
+          <div className="text-6xl mb-4">🔍</div>
+          <h1 className="text-2xl font-bold text-white">404</h1>
+          <p className="text-slate-400 text-sm mt-2">Page not found</p>
+        </div>
+      </main>
+    }
+  />
+      </Routes >
+    </BrowserRouter >
   );
 }
 

@@ -2,8 +2,9 @@ import React from 'react';
 import PortalHeader from '../components/PortalHeader';
 import CustomerIdentityCard from '../components/CustomerIdentityCard';
 import PortalStatusCard from '../components/PortalStatusCard';
-import QuotationsPlaceholder from '../components/QuotationsPlaceholder';
+import QuotationsList from '../components/QuotationsList';
 import useCustomerPortal from '../hooks/useCustomerPortal';
+import DealHealthWidget from '../../deal-health/components/DealHealthWidget';
 
 /**
  * PortalDashboardPage
@@ -67,15 +68,16 @@ function PortalDashboardPage() {
           {/* Dashboard content */}
           {!isLoading && !error && (
             <div className="portal-grid">
-              {/* Left column: Identity + Status */}
-              <div className="portal-sidebar">
+              {/* Left column: Identity + Status + Health */}
+              <div className="portal-sidebar space-y-6">
                 <CustomerIdentityCard profile={profile} />
                 <PortalStatusCard status={status} />
+                <DealHealthWidget />
               </div>
 
               {/* Right column: Quotations */}
               <div className="portal-content-area">
-                <QuotationsPlaceholder />
+                <QuotationsList />
               </div>
             </div>
           )}

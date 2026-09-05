@@ -42,6 +42,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/approvals', approvalRoutes);
 app.use('/api/portal', customerPortalRoutes);
 app.use('/api/portal/negotiations', negotiationRoutes);
+app.use('/api/negotiation', negotiationRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/payments', paymentRoutes);

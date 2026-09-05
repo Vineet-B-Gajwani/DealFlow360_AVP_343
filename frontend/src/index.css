@@ -231,4 +231,79 @@
   .portal-error-state {
     @apply flex flex-col items-center justify-center py-24 text-center;
   }
+
+  /* ── Customer Portal — Quotations ───────────────────────────────────────── */
+
+  /* Grid for quotation cards */
+  .quotations-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+  }
+
+  /* Individual quotation card in list */
+  .quotation-card {
+    @apply block bg-slate-800/40 hover:bg-slate-800/80
+           border border-slate-700/50 hover:border-slate-600
+           rounded-xl p-5 relative overflow-hidden
+           transition-all duration-200 cursor-pointer;
+  }
+
+  /* Status badge base */
+  .quotation-status-badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full
+           text-xs font-semibold whitespace-nowrap;
+  }
+
+  /* Status variations */
+  .qstatus-draft {
+    @apply bg-slate-800 text-slate-300 border border-slate-700;
+  }
+  .qstatus-pending {
+    @apply bg-amber-900/30 text-amber-400 border border-amber-700/50;
+  }
+  .qstatus-approved {
+    @apply bg-emerald-900/30 text-emerald-400 border border-emerald-700/50;
+  }
+  .qstatus-rejected {
+    @apply bg-red-900/30 text-red-400 border border-red-700/50;
+  }
+  .qstatus-sent {
+    @apply bg-brand-900/40 text-brand-400 border border-brand-700/50;
+  }
+  .qstatus-expired {
+    @apply bg-slate-800 text-slate-400 border border-slate-700;
+  }
+  .qstatus-accepted {
+    @apply bg-teal-900/40 text-teal-400 border border-teal-700/50;
+  }
+  .qstatus-unknown {
+    @apply bg-slate-800 text-slate-400 border border-slate-700;
+  }
+
+  /* Quotation line items table */
+  .quotation-table-wrapper {
+    @apply overflow-x-auto rounded-xl border border-slate-700/60 bg-slate-800/20;
+  }
+
+  .quotation-table {
+    @apply w-full text-sm text-left border-collapse min-w-[600px];
+  }
+
+  .quotation-th {
+    @apply bg-slate-800/80 text-slate-400 font-semibold py-3 px-4
+           border-b border-slate-700/60 whitespace-nowrap;
+  }
+
+  .quotation-tr {
+    @apply border-b border-slate-700/30 hover:bg-slate-800/40 transition-colors duration-150 last:border-0;
+  }
+
+  .quotation-td {
+    @apply py-3 px-4 align-top;
+  }
+
+  /* Totals section */
+  .quotation-totals {
+    @apply bg-slate-800/30 rounded-xl border border-slate-700/50 p-5;
+  }
 }
+
