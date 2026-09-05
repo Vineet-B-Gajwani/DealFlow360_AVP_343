@@ -11,6 +11,13 @@ import InvoiceListPage from './features/invoices/pages/InvoiceListPage';
 import InvoiceDetailPage from './features/invoices/pages/InvoiceDetailPage';
 import ReportingDashboard from './features/reporting/pages/ReportingDashboard';
 import useAuth from './features/auth/hooks/useAuth';
+import ApprovalDashboardPage from './features/approvals/pages/ApprovalDashboardPage';
+import ApprovalListPage from './features/approvals/pages/ApprovalListPage';
+import ApprovalDetailPage from './features/approvals/pages/ApprovalDetailPage';
+import InventoryListPage from './features/inventory/pages/InventoryListPage';
+import FulfillmentDashboardPage from './features/fulfillment/pages/FulfillmentDashboardPage';
+import SubscriptionPlansPage from './features/subscriptions/pages/SubscriptionPlansPage';
+import BillingDashboardPage from './features/billing/pages/BillingDashboardPage';
 
 // ── Temporary placeholder dashboard — replace in a future feature ─────────────
 function DashboardPlaceholder() {
@@ -61,6 +68,13 @@ function App() {
         {/* Authenticated routes (any role) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPlaceholder />} />
+          <Route path="/approvals/dashboard" element={<ApprovalDashboardPage />} />
+          <Route path="/approvals/list" element={<ApprovalListPage />} />
+          <Route path="/approvals/:id" element={<ApprovalDetailPage />} />
+          <Route path="/inventory" element={<InventoryListPage />} />
+          <Route path="/fulfillment" element={<FulfillmentDashboardPage />} />
+          <Route path="/subscriptions" element={<SubscriptionPlansPage />} />
+          <Route path="/billing" element={<BillingDashboardPage />} />
         </Route>
 
         {/* ── Customer Portal routes ─────────────────────────────────────── */}

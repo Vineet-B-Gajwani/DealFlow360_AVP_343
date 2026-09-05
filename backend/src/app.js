@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 
 const authRoutes = require('./features/auth/auth.routes');
+const approvalRoutes = require('./features/approvals/approval.routes');
 const customerPortalRoutes = require('./features/customer-portal/customerPortal.routes');
 const negotiationRoutes = require('./features/negotiation/negotiation.routes');
 const invoiceRoutes = require('./features/invoices/invoice.routes');
@@ -37,6 +38,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
+app.use('/api/approvals', approvalRoutes);
 app.use('/api/portal', customerPortalRoutes);
 app.use('/api/negotiation', negotiationRoutes);
 app.use('/api/invoices', invoiceRoutes);
@@ -44,6 +46,10 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/deal-health', dealHealthRoutes);
 app.use('/api/reporting', reportingRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/inventory', require('./features/inventory/inventory.routes'));
+app.use('/api/fulfillment', require('./features/fulfillment/fulfillment.routes'));
+app.use('/api/subscriptions', require('./features/subscriptions/subscriptionPlan.routes'));
+app.use('/api/billing', require('./features/billing/billing.routes'));
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) =>
