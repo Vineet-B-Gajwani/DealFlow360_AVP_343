@@ -19,8 +19,12 @@ const registerRules = [
     .notEmpty()
     .withMessage('Email is required')
     .isEmail()
-    .withMessage('Must be a valid email address')
-    .normalizeEmail(),
+    .withMessage('Must be a valid email address'),
+    // NOTE: Do NOT call .normalizeEmail() here.
+    // The User schema already has `lowercase: true` which normalises the email
+    // at the Mongoose layer consistently. Using normalizeEmail() here would
+    // strip "+" tags and alter the value before it reaches the model, causing
+    // login mismatches for users whose email was not already lowercase.
 
   body('password')
     .notEmpty()
@@ -47,8 +51,8 @@ const loginRules = [
     .notEmpty()
     .withMessage('Email is required')
     .isEmail()
-    .withMessage('Must be a valid email address')
-    .normalizeEmail(),
+    .withMessage('Must be a valid email address'),
+    // NOTE: No .normalizeEmail() — see registerRules comment above.
 
   body('password').notEmpty().withMessage('Password is required'),
 ];

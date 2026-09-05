@@ -6,6 +6,12 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import CustomerPortalRoute from './routes/CustomerPortalRoute';
 import PortalLoginPage from './features/customer-portal/pages/PortalLoginPage';
 import PortalDashboardPage from './features/customer-portal/pages/PortalDashboardPage';
+import ProductListPage from './features/products/pages/ProductListPage';
+import ProductCreatePage from './features/products/pages/ProductCreatePage';
+import ProductEditPage from './features/products/pages/ProductEditPage';
+import InvoiceListPage from './features/invoices/pages/InvoiceListPage';
+import DealHealthDashboardPage from './features/deal-health/pages/DealHealthDashboardPage';
+import ReportingDashboardPage from './features/reporting/pages/ReportingDashboardPage';
 import useAuth from './features/auth/hooks/useAuth';
 import ApprovalListPage from './features/approvals/pages/ApprovalListPage';
 import ApprovalDetailPage from './features/approvals/pages/ApprovalDetailPage';
@@ -61,6 +67,16 @@ function App() {
           <Route path="/dashboard" element={<DashboardPlaceholder />} />
           <Route path="/approvals" element={<ApprovalListPage />} />
           <Route path="/approvals/:id" element={<ApprovalDetailPage />} />
+          <Route path="/products" element={<ProductListPage />} />
+          <Route path="/invoices" element={<InvoiceListPage />} />
+        </Route>
+
+        {/* Executive & Sales Management Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'SALES_MANAGER']} />}>
+          <Route path="/products/new" element={<ProductCreatePage />} />
+          <Route path="/products/:id/edit" element={<ProductEditPage />} />
+          <Route path="/deal-health" element={<DealHealthDashboardPage />} />
+          <Route path="/reporting" element={<ReportingDashboardPage />} />
         </Route>
 
         {/* ── Customer Portal routes ─────────────────────────────────────── */}
