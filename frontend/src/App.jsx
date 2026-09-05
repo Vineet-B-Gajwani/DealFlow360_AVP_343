@@ -4,6 +4,8 @@ import LoginPage from './features/auth/pages/LoginPage';
 import RegisterPage from './features/auth/pages/RegisterPage';
 import ProtectedRoute from './routes/ProtectedRoute';
 import useAuth from './features/auth/hooks/useAuth';
+import ApprovalListPage from './features/approvals/pages/ApprovalListPage';
+import ApprovalDetailPage from './features/approvals/pages/ApprovalDetailPage';
 
 // ── Temporary placeholder dashboard — replace in a future feature ─────────────
 function DashboardPlaceholder() {
@@ -54,6 +56,8 @@ function App() {
         {/* Authenticated routes (any role) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPlaceholder />} />
+          <Route path="/approvals" element={<ApprovalListPage />} />
+          <Route path="/approvals/:id" element={<ApprovalDetailPage />} />
         </Route>
 
         {/* Example: ADMIN-only protected route */}
