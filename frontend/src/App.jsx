@@ -9,6 +9,9 @@ import PortalDashboardPage from './features/customer-portal/pages/PortalDashboar
 import ProductListPage from './features/products/pages/ProductListPage';
 import ProductCreatePage from './features/products/pages/ProductCreatePage';
 import ProductEditPage from './features/products/pages/ProductEditPage';
+import InvoiceListPage from './features/invoices/pages/InvoiceListPage';
+import DealHealthDashboardPage from './features/deal-health/pages/DealHealthDashboardPage';
+import ReportingDashboardPage from './features/reporting/pages/ReportingDashboardPage';
 import useAuth from './features/auth/hooks/useAuth';
 
 // ── Temporary placeholder dashboard — replace in a future feature ─────────────
@@ -61,12 +64,15 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPlaceholder />} />
           <Route path="/products" element={<ProductListPage />} />
+          <Route path="/invoices" element={<InvoiceListPage />} />
         </Route>
 
-        {/* Product Management (ADMIN & SALES_MANAGER write access) */}
+        {/* Executive & Sales Management Routes */}
         <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'SALES_MANAGER']} />}>
           <Route path="/products/new" element={<ProductCreatePage />} />
           <Route path="/products/:id/edit" element={<ProductEditPage />} />
+          <Route path="/deal-health" element={<DealHealthDashboardPage />} />
+          <Route path="/reporting" element={<ReportingDashboardPage />} />
         </Route>
 
         {/* ── Customer Portal routes ─────────────────────────────────────── */}

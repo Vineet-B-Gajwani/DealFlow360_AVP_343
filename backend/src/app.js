@@ -8,6 +8,12 @@ const morgan = require('morgan');
 const authRoutes = require('./features/auth/auth.routes');
 const customerPortalRoutes = require('./features/customer-portal/customerPortal.routes');
 const productRoutes = require('./features/products/product.routes');
+const negotiationRoutes = require('./features/negotiation/negotiation.routes');
+const invoiceRoutes = require('./features/invoices/invoice.routes');
+const paymentRoutes = require('./features/payments/payment.routes');
+const dealHealthRoutes = require('./features/deal-health/dealHealth.routes');
+const reportingRoutes = require('./features/reporting/reporting.routes');
+const notificationRoutes = require('./features/notifications/notification.routes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -33,7 +39,13 @@ if (process.env.NODE_ENV !== 'test') {
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/portal', customerPortalRoutes);
+app.use('/api/portal/negotiations', negotiationRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/deal-health', dealHealthRoutes);
+app.use('/api/reporting', reportingRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) =>
